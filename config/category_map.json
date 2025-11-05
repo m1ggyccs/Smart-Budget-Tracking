@@ -1,0 +1,34 @@
+{
+  "groceries": [
+    "food",
+    "snacks",
+    "groceries",
+    "grocery",
+    "supermarket"
+  ],
+  "transportation": [
+    "train",
+    "bus",
+    "taxi",
+    "grab",
+    "transportation",
+    "fuel"
+  ],
+  "utilities": [
+    "electricity",
+    "water",
+    "internet",
+    "mobile",
+    "utilities",
+    "telco"
+  ],
+  "entertainment": [
+    "subscription",
+    "netflix",
+    "music",
+    "festivals",
+    "leisure",
+    "entertainment"
+  ],
+  "others": []
+}
