@@ -10,7 +10,6 @@ date,category,amount
 2015-01-16 16:30:51,transportation,10.0
 2015-01-16 16:32:42,transportation,50.0
 2015-01-16 16:33:49,transportation,30.0
-2015-01-18 07:31:42,groceries,29.0
 2015-01-18 07:31:42,groceries,8.0
 2015-01-18 07:33:20,groceries,60.0
 2015-01-19 07:34:00,groceries,29.0
@@ -19,10 +18,8 @@ date,category,amount
 2015-01-21 09:32:34,groceries,28.0
 2015-01-21 13:11:41,transportation,138.0
 2015-01-21 13:12:12,transportation,264.0
-2015-01-21 18:17:03,groceries,27.0
 2015-01-21 18:17:03,others,60.0
 2015-01-21 18:17:03,groceries,120.0
-2015-01-22 16:44:45,groceries,33.0
 2015-01-22 16:44:45,groceries,20.0
 2015-01-24 16:17:57,groceries,30.0
 2015-01-25 18:45:56,others,60.0
@@ -31,14 +28,10 @@ date,category,amount
 2015-01-26 19:39:39,groceries,26.0
 2015-01-27 18:34:10,groceries,30.0
 2015-01-27 18:34:20,groceries,15.0
-2015-01-29 07:30:48,groceries,15.0
-2015-01-29 07:30:48,groceries,38.0
 2015-01-29 07:30:48,groceries,26.0
 2015-01-30 23:10:04,groceries,1004.0
 2015-01-30 23:10:04,transportation,100.0
-2015-01-31 16:14:27,groceries,40.0
 2015-01-31 16:14:27,groceries,20.0
-2015-02-13 09:08:59,groceries,27.0
 2015-02-13 09:08:59,groceries,21.0
 2015-02-15 08:40:08,groceries,15.0
 2015-02-15 08:40:26,groceries,20.0
@@ -66,7 +59,6 @@ date,category,amount
 2015-02-26 20:06:17,transportation,60.0
 2015-02-26 20:06:17,groceries,6.0
 2015-02-28 11:33:42,groceries,26.0
-2015-02-28 17:48:39,groceries,20.0
 2015-02-28 17:48:39,groceries,55.0
 2015-03-13 15:01:05,transportation,10.0
 2015-03-14 09:11:06,groceries,26.0
@@ -90,7 +82,6 @@ date,category,amount
 2015-03-25 14:02:02,utilities,20.0
 2015-03-29 20:06:39,groceries,150.0
 2015-03-29 20:08:01,others,269.0
-2015-04-13 12:24:47,others,1000.0
 2015-04-13 12:24:47,others,1000.0
 2015-04-14 12:24:47,others,500.0
 2015-04-18 10:33:25,groceries,324.0
@@ -128,7 +119,6 @@ date,category,amount
 2015-09-28 10:53:25,others,120.0
 2015-09-28 10:54:06,others,350.0
 2015-09-30 14:24:23,others,100.0
-2015-10-18 21:35:17,others,2000.0
 2015-10-18 21:35:17,transportation,803.0
 2015-10-18 21:35:17,others,1479.0
 2015-10-21 18:16:08,others,500.0
@@ -154,8 +144,6 @@ date,category,amount
 2015-11-21 21:40:52,others,251.0
 2015-11-26 06:51:26,others,199.0
 2015-11-27 16:25:01,groceries,25.0
-2015-11-29 09:27:52,transportation,50.0
-2015-11-29 09:27:52,transportation,40.0
 2015-11-29 09:27:52,transportation,30.0
 2015-12-19 14:20:11,others,235.0
 2015-12-19 21:14:02,others,220.0
@@ -234,7 +222,6 @@ date,category,amount
 2016-08-29 10:48:20,others,98.0
 2016-08-29 10:48:48,others,40.0
 2016-08-29 11:41:25,entertainment,361.0
-2016-09-13 09:48:13,groceries,845.0
 2016-09-13 09:48:13,groceries,70.0
 2016-09-14 10:13:24,others,437.0
 2016-09-14 13:24:08,entertainment,251.0
@@ -263,23 +250,13 @@ date,category,amount
 2016-11-15 20:23:12,others,10.0
 2016-11-15 20:23:29,groceries,20.0
 2016-11-17 20:17:21,groceries,10.0
-2016-11-19 11:58:28,transportation,100.0
 2016-11-19 11:58:28,groceries,40.0
 2016-11-19 11:58:28,others,740.0
-2016-11-19 11:58:28,transportation,54.0
-2016-11-19 11:58:28,transportation,100.0
-2016-11-19 11:58:28,transportation,338.0
-2016-11-19 11:58:28,transportation,80.0
 2016-11-19 11:58:28,transportation,40.0
-2016-11-19 12:12:00,transportation,94.0
-2016-11-19 12:12:00,transportation,40.0
-2016-11-19 12:12:00,others,100.0
-2016-11-19 12:12:00,groceries,40.0
-2016-11-19 12:12:00,transportation,50.0
-2016-11-19 12:12:00,groceries,1087.0
 2016-11-19 12:12:00,groceries,2.0
+2016-11-19 12:12:00,others,100.0
+2016-11-19 12:12:00,transportation,50.0
 2016-11-20 11:58:05,transportation,50.0
-2016-11-21 09:41:12,transportation,70.0
 2016-11-21 09:41:12,others,15.0
 2016-11-21 09:41:12,transportation,50.0
 2016-11-25 09:27:45,entertainment,251.0
@@ -321,9 +298,7 @@ date,category,amount
 2016-12-31 15:40:02,others,24.0
 2016-12-31 17:39:16,others,1096.0
 2016-12-31 19:34:55,groceries,25.0
-2016-12-31 20:11:24,groceries,375.0
 2016-12-31 20:11:24,groceries,77.0
-2017-01-15 08:25:53,groceries,140.0
 2017-01-15 08:25:53,groceries,540.0
 2017-01-16 08:25:05,others,50.0
 2017-01-16 11:01:54,others,2400.0
@@ -344,29 +319,23 @@ date,category,amount
 2017-01-29 19:26:04,groceries,30.0
 2017-01-29 20:19:46,groceries,60.0
 2017-01-29 20:20:15,groceries,250.0
-2017-01-30 07:24:02,groceries,15.0
 2017-01-30 07:24:02,groceries,35.0
 2017-01-31 09:22:32,groceries,35.0
 2017-02-13 17:20:15,entertainment,301.0
 2017-02-16 17:32:36,others,400.0
 2017-02-18 11:12:58,entertainment,301.0
 2017-02-18 13:19:49,others,500.0
-2017-02-19 08:04:37,others,498.0
-2017-02-19 08:04:37,others,25.0
 2017-02-19 08:04:37,groceries,30.0
 2017-02-19 08:04:37,others,23.0
 2017-02-21 22:00:35,groceries,10.0
 2017-02-22 21:59:31,transportation,5500.0
 2017-02-22 22:00:06,others,30.0
 2017-02-23 02:14:24,groceries,80.0
-2017-02-24 13:09:50,groceries,30.0
-2017-02-24 13:09:50,groceries,75.0
 2017-02-24 13:09:50,groceries,100.0
 2017-02-25 13:21:15,groceries,247.0
 2017-02-25 20:29:44,entertainment,100.0
 2017-02-25 20:39:26,groceries,318.0
 2017-02-25 20:40:36,others,920.0
-2017-02-25 20:41:26,others,1600.0
 2017-02-25 20:41:26,others,8500.0
 2017-02-26 00:00:25,groceries,58.0
 2017-02-26 00:01:25,others,360.0
@@ -376,11 +345,7 @@ date,category,amount
 2017-02-27 09:17:17,groceries,76.0
 2017-02-27 09:18:03,others,55.0
 2017-02-27 18:31:38,groceries,88.0
-2017-02-27 18:42:27,transportation,30.0
-2017-02-27 18:42:27,transportation,30.0
 2017-02-27 18:42:27,transportation,40.0
-2017-02-28 12:32:35,transportation,30.0
-2017-02-28 12:32:35,transportation,57.0
 2017-02-28 12:32:35,transportation,80.0
 2017-02-28 22:01:48,transportation,40.0
 2017-02-28 22:06:58,groceries,30.0
@@ -399,18 +364,13 @@ date,category,amount
 2017-03-13 21:47:02,groceries,100.0
 2017-03-14 20:20:07,others,300.0
 2017-03-15 06:17:32,groceries,40.0
-2017-03-15 06:17:55,others,111.0
 2017-03-15 06:17:55,others,50.0
 2017-03-16 20:39:13,entertainment,2820.0
-2017-03-18 09:41:44,groceries,310.0
-2017-03-18 09:41:44,groceries,160.0
 2017-03-18 09:41:44,groceries,57.0
 2017-03-19 13:28:22,entertainment,296.0
 2017-03-20 11:45:21,others,450.0
 2017-03-22 06:57:25,transportation,600.0
-2017-03-22 23:10:50,transportation,30.0
 2017-03-22 23:10:50,transportation,20.0
-2017-03-22 23:11:47,transportation,33.0
 2017-03-22 23:11:47,transportation,18.0
 2017-03-22 23:14:21,others,500.0
 2017-03-22 23:16:53,transportation,50.0
@@ -421,7 +381,6 @@ date,category,amount
 2017-03-25 09:14:09,groceries,60.0
 2017-03-25 13:41:02,others,150.0
 2017-03-25 14:49:45,transportation,900.0
-2017-03-25 14:50:06,others,110.0
 2017-03-25 14:50:06,others,29.0
 2017-03-25 14:50:06,groceries,20.0
 2017-03-26 13:43:07,groceries,60.0
@@ -450,7 +409,6 @@ date,category,amount
 2017-04-22 07:26:43,groceries,205.0
 2017-04-22 09:06:19,groceries,20.0
 2017-04-22 09:06:19,transportation,30.0
-2017-04-23 23:52:40,groceries,40.0
 2017-04-23 23:52:40,groceries,15.0
 2017-04-24 23:51:40,others,170.0
 2017-04-25 09:20:48,groceries,64.0
@@ -484,8 +442,6 @@ date,category,amount
 2017-05-16 14:39:07,others,247.0
 2017-05-16 19:10:09,groceries,10.0
 2017-05-17 10:27:35,groceries,10.0
-2017-05-17 14:12:16,groceries,210.0
-2017-05-17 14:12:16,groceries,99.0
 2017-05-17 14:12:16,groceries,5.0
 2017-05-18 11:06:06,groceries,10.0
 2017-05-18 11:06:19,groceries,64.0
@@ -493,7 +449,6 @@ date,category,amount
 2017-05-18 11:06:52,groceries,25.0
 2017-05-18 16:11:08,groceries,45.0
 2017-05-18 16:11:26,groceries,60.0
-2017-05-18 16:11:48,groceries,10.0
 2017-05-18 16:11:48,groceries,219.0
 2017-05-21 09:40:52,transportation,20.0
 2017-05-21 15:26:54,groceries,24.0
@@ -522,7 +477,6 @@ date,category,amount
 2017-05-28 19:39:31,groceries,45.0
 2017-05-28 20:47:18,groceries,24.0
 2017-05-28 20:47:33,others,996.0
-2017-05-29 09:25:48,groceries,35.0
 2017-05-29 09:25:48,others,30.0
 2017-05-29 09:25:48,groceries,64.0
 2017-05-30 09:41:14,transportation,30.0
@@ -535,7 +489,6 @@ date,category,amount
 2017-05-30 19:57:58,groceries,25.0
 2017-05-31 20:47:17,others,655.0
 2017-06-13 20:06:49,groceries,64.0
-2017-06-15 19:01:47,others,29.0
 2017-06-15 19:01:47,others,50.0
 2017-06-16 19:03:15,groceries,64.0
 2017-06-16 23:18:37,others,137.0
@@ -544,8 +497,6 @@ date,category,amount
 2017-06-18 20:01:48,transportation,12.0
 2017-06-19 10:19:14,groceries,64.0
 2017-06-19 10:19:33,groceries,18.0
-2017-06-19 10:19:53,groceries,80.0
-2017-06-19 10:19:53,groceries,141.0
 2017-06-19 10:19:53,groceries,60.0
 2017-06-20 21:08:28,others,250.0
 2017-06-22 23:02:07,transportation,30.0
@@ -648,7 +599,6 @@ date,category,amount
 2017-08-21 11:59:10,groceries,33.0
 2017-08-21 18:02:12,others,50.0
 2017-08-21 18:02:58,others,280.0
-2017-08-22 16:11:00,others,300.0
 2017-08-22 16:11:00,others,5000.0
 2017-08-23 14:07:44,transportation,850.0
 2017-08-23 14:08:23,groceries,300.0
@@ -658,7 +608,6 @@ date,category,amount
 2017-08-24 22:31:56,transportation,40.0
 2017-08-25 05:51:28,others,39.0
 2017-08-26 22:17:11,groceries,5.0
-2017-08-27 04:44:32,others,100.0
 2017-08-27 04:44:32,others,59.0
 2017-08-27 04:44:32,transportation,200.0
 2017-08-28 12:06:47,groceries,20.0
@@ -777,8 +726,6 @@ date,category,amount
 2017-11-19 20:23:22,groceries,20.0
 2017-11-20 18:39:39,groceries,70.0
 2017-11-23 06:16:26,groceries,69.0
-2017-11-23 12:22:39,groceries,21.0
-2017-11-23 12:22:39,groceries,17.0
 2017-11-23 12:22:39,groceries,23.0
 2017-11-24 12:22:39,others,314.0
 2017-11-25 08:35:44,groceries,10.0
@@ -796,15 +743,10 @@ date,category,amount
 2017-11-27 16:07:30,transportation,30.0
 2017-11-27 21:05:52,others,1000.0
 2017-11-28 08:30:27,groceries,69.0
-2017-11-28 17:35:35,groceries,140.0
 2017-11-28 17:35:35,others,115.0
-2017-11-28 17:35:35,groceries,18.0
-2017-11-28 17:35:35,groceries,42.0
 2017-11-28 17:35:35,groceries,90.0
 2017-11-30 08:55:08,others,50.0
 2017-11-30 16:56:20,others,10000.0
-2017-11-30 20:20:53,others,22700.0
-2017-11-30 20:20:53,others,800.0
 2017-11-30 20:20:53,others,22.0
 2017-12-13 07:31:27,groceries,69.0
 2017-12-13 17:42:27,others,20.0
@@ -826,7 +768,7 @@ date,category,amount
 2017-12-19 18:57:13,groceries,45.0
 2017-12-19 20:25:07,others,500.0
 2017-12-20 10:31:16,groceries,95.0
-2017-12-20 10:31:16,entertainment,20388.323605178197
+2017-12-20 10:31:16,entertainment,20388.3236051782
 2017-12-21 14:34:05,groceries,70.0
 2017-12-21 14:34:40,groceries,65.0
 2017-12-21 20:45:11,groceries,15.0
@@ -858,7 +800,7 @@ date,category,amount
 2018-01-14 12:21:16,transportation,13.694324988776584
 2018-01-14 15:21:39,others,199.0
 2018-01-14 15:22:04,others,798.0
-2018-01-14 15:22:40,transportation,14.885135857365853
+2018-01-14 15:22:40,transportation,14.885135857365851
 2018-01-14 15:22:51,transportation,11.908108685892682
 2018-01-14 15:23:43,transportation,23.816217371785363
 2018-01-15 13:50:29,transportation,158.37784552237267
@@ -905,7 +847,7 @@ date,category,amount
 2018-01-30 21:05:19,groceries,20.0
 2018-01-30 21:05:31,others,10.0
 2018-01-31 07:31:34,groceries,69.0
-2018-01-31 20:01:53,transportation,29.770271714731706
+2018-01-31 20:01:53,transportation,29.770271714731702
 2018-01-31 22:00:22,groceries,320.0
 2018-02-13 06:58:06,groceries,72.0
 2018-02-13 20:22:43,groceries,72.0
@@ -949,7 +891,6 @@ date,category,amount
 2018-03-14 06:04:18,groceries,525.7988550323179
 2018-03-14 21:38:13,groceries,36.38746401607736
 2018-03-14 21:39:40,others,140.0
-2018-03-15 16:27:45,groceries,32.748717614469626
 2018-03-15 16:27:45,groceries,54.581196024116046
 2018-03-17 13:13:18,groceries,33.65840421487156
 2018-03-17 22:50:45,groceries,27.290598012058023
@@ -964,7 +905,7 @@ date,category,amount
 2018-03-20 16:15:16,groceries,32.748717614469626
 2018-03-20 16:15:41,groceries,32.748717614469626
 2018-03-20 16:15:59,groceries,16.374358807234813
-2018-03-20 16:26:08,groceries,196.26488403671726
+2018-03-20 16:26:08,groceries,196.2648840367173
 2018-03-20 16:30:07,others,17.0
 2018-03-20 20:13:08,groceries,223.78290369887577
 2018-03-21 17:26:41,others,50.0
@@ -978,7 +919,7 @@ date,category,amount
 2018-03-22 22:30:20,groceries,13.645299006029012
 2018-03-22 22:30:49,groceries,6.367806202813538
 2018-03-23 19:48:39,others,100.0
-2018-03-25 21:12:00,groceries,218.32478409646419
+2018-03-25 21:12:00,groceries,218.32478409646416
 2018-03-25 21:12:38,groceries,72.77492803215472
 2018-03-25 21:13:19,groceries,145.54985606430944
 2018-03-25 21:13:44,groceries,18.19373200803868
@@ -993,7 +934,7 @@ date,category,amount
 2018-03-30 20:10:12,groceries,22.74216501004835
 2018-03-31 07:26:26,transportation,30.0
 2018-03-31 11:32:03,transportation,10.0
-2018-03-31 13:20:18,groceries,381.15868556841036
+2018-03-31 13:20:18,groceries,381.1586855684104
 2018-03-31 19:45:07,groceries,221.96353049807192
 2018-03-31 21:39:12,groceries,40.93589701808703
 2018-04-13 20:34:03,others,700.0
@@ -1134,8 +1075,7 @@ date,category,amount
 2018-07-27 18:39:39,others,808.6128875891679
 2018-07-28 20:45:00,others,3671.063351645738
 2018-07-28 21:30:49,groceries,195.0
-2018-07-28 23:42:57,others,471.227481319518
-2018-07-28 23:42:57,others,195.79004542110602
+2018-07-28 23:42:57,others,195.790045421106
 2018-07-29 10:12:59,groceries,105.0
 2018-07-29 11:38:08,transportation,40.0
 2018-07-29 11:39:53,transportation,15.0
@@ -1144,7 +1084,7 @@ date,category,amount
 2018-07-30 11:49:11,groceries,25.0
 2018-07-30 13:19:36,groceries,212.0
 2018-07-30 13:19:56,others,129.22142997792997
-2018-07-30 18:44:23,others,97.89502271055301
+2018-07-30 18:44:23,others,97.895022710553
 2018-07-31 13:44:15,groceries,10.0
 2018-07-31 13:45:08,others,1957.9004542110604
 2018-07-31 18:01:20,others,29368.506813165903
@@ -1181,13 +1121,11 @@ date,category,amount
 2018-08-27 10:52:51,groceries,60.0
 2018-08-27 21:30:16,groceries,20.0
 2018-08-29 12:11:41,groceries,36.0
-2018-08-29 12:21:49,groceries,15.0
 2018-08-29 12:21:49,groceries,27.0
 2018-08-30 21:09:51,others,343.0
 2018-08-30 21:10:24,groceries,78.0
 2018-08-31 09:26:17,groceries,36.0
 2018-08-31 10:01:15,groceries,510.85
-2018-08-31 15:12:20,others,118.0
 2018-08-31 15:12:20,others,1000.0
 2018-09-13 21:01:32,groceries,46.0
 2018-09-13 21:01:47,others,83.0
@@ -1198,980 +1136,11 @@ date,category,amount
 2018-09-17 23:41:17,entertainment,19.0
 2018-09-20 12:03:15,groceries,60.0
 2018-09-20 12:04:08,transportation,30.0
-,entertainment,199.0
-,entertainment,667.0
-,groceries,650.0
-,groceries,36.0
-,groceries,36.0
-,others,40.0
-,groceries,37.0
-,groceries,55.0
-,others,77.0
-,groceries,30.0
-,groceries,40.0
-,groceries,24.0
-,groceries,36.0
-,groceries,18.0
-,others,2000.0
-,entertainment,199.0
-,groceries,96.0
-,others,35.0
-,others,100.0
-,others,100.0
-,groceries,10.0
-,others,4300.0
-,others,3410.0
-,transportation,20.0
-,transportation,15.0
-,others,398.0
-,others,2000.0
-,others,18.0
-,groceries,216.0
-,others,1000.0
-,others,40.0
-,groceries,35.0
-,groceries,57.0
-,transportation,360.0
-,groceries,20.0
-,groceries,60.0
-,transportation,185.0
-,groceries,30.0
-,others,153.0
-,others,500.0
-,transportation,130.0
-,transportation,675.0
-,transportation,10.0
-,groceries,2.0
-,entertainment,196.0
-,groceries,760.0
-,transportation,100.0
-,transportation,83.0
-,groceries,7.0
-,transportation,15.0
-,transportation,20.0
-,others,100.0
-,others,50.0
-,others,350.0
-,others,1440.0
-,others,500.0
-,groceries,36.0
-,entertainment,154.0
-,others,1595.0
-,transportation,50.0
-,transportation,20.0
-,others,626.0
-,transportation,26.0
-,transportation,40.0
-,others,461.0
-,transportation,1890.0
-,groceries,15.0
-,others,430.0
-,others,98.0
-,groceries,72.0
-,others,10000.0
-,groceries,84.0
-,others,1407.0
-,others,3000.0
-,entertainment,667.0
-,groceries,437.0
-,groceries,70.0
-,groceries,48.0
-,groceries,72.0
-,groceries,20.0
-,groceries,80.0
-,entertainment,12.0
-,groceries,45.0
-,groceries,36.0
-,entertainment,199.0
-,groceries,500.0
-,groceries,72.0
-,others,50.0
-,others,1086.0
-,transportation,20.0
-,entertainment,515.0
-,groceries,430.0
-,groceries,72.0
-,others,600.0
-,others,37.0
-,groceries,72.0
-,groceries,40.0
-,groceries,280.0
-,groceries,72.0
-,others,43.0
-,others,122.0
-,others,260.0
-,others,10000.0
-,entertainment,199.0
-,others,112.0
-,groceries,20.0
-,groceries,130.0
-,groceries,18.0
-,groceries,70.0
-,others,250.0
-,groceries,10.0
-,groceries,72.0
-,others,1857.0
-,others,24.0
-,groceries,36.0
-,others,24500.0
-,others,38.0
-,groceries,36.0
-,groceries,72.0
-,groceries,130.0
-,transportation,20.0
-,others,149.0
-,groceries,24.0
-,groceries,20.0
-,groceries,36.0
-,others,2000.0
-,others,5.9
-,others,24.78
-,groceries,72.0
-,others,10005.9
-,transportation,1293.0
-,others,300.0
-,others,77.0
-,groceries,72.0
-,groceries,36.0
-,others,91.0
-,groceries,40.0
-,entertainment,540.0
-,groceries,36.0
-,groceries,36.0
-,entertainment,20.0
-,groceries,30.0
-,others,172.0
-,others,22.0
-,others,4.0
-,groceries,36.0
-,others,50.0
-,others,50.0
-,groceries,20.0
-,groceries,162.0
-,others,1357.0
-,others,972.0
-,others,10.0
-,others,450.0
-,groceries,130.0
-,groceries,36.0
-,groceries,15.0
-,groceries,189.0
-,groceries,36.0
-,others,10000.0
-,groceries,36.0
-,groceries,30.0
-,groceries,162.0
-,transportation,30.0
-,groceries,235.0
-,groceries,15.0
-,transportation,40.0
-,transportation,15.0
-,groceries,69.0
-,others,98.0
-,groceries,35.0
-,groceries,25.0
-,groceries,69.0
-,others,312.0
-,others,500.0
-,groceries,220.0
-,groceries,45.0
-,groceries,69.0
-,groceries,452.0
-,groceries,50.0
-,groceries,35.0
-,groceries,10.0
-,transportation,945.0
-,groceries,82.0
-,others,170.0
-,groceries,30.0
-,groceries,15.0
-,others,2000.0
-,others,10000.0
-,others,226.0
-,others,500.0
-,groceries,42.0
-,groceries,69.0
-,groceries,40.0
-,groceries,34.0
-,groceries,69.0
-,groceries,20.0
-,others,1399.0
-,groceries,104.0
-,others,165.0
-,groceries,20.0
-,transportation,20.0
-,entertainment,810.0
-,others,38.0
-,others,100.0
-,groceries,20.0
-,groceries,69.0
-,others,270.0
-,others,130.0
-,groceries,70.0
-,others,50.0
-,groceries,681.0
-,transportation,1000.0
-,groceries,40.0
-,groceries,69.0
-,others,1140.0
-,others,158.0
-,entertainment,482.0
-,groceries,15.0
-,others,599.0
-,groceries,69.0
-,others,30000.0
-,others,2000.0
-,groceries,40.0
-,groceries,100.0
-,groceries,80.0
-,groceries,90.0
-,groceries,310.0
-,groceries,25.0
-,groceries,65.0
-,groceries,85.0
-,groceries,408.0
-,groceries,69.0
-,groceries,125.0
-,entertainment,100.0
-,entertainment,2700.0
-,others,937.0
-,others,990.0
-,groceries,120.0
-,groceries,35.0
-,groceries,50.0
-,groceries,69.0
-,entertainment,110.0
-,groceries,30.0
-,groceries,290.0
-,others,20.0
-,others,160.0
-,groceries,35.0
-,groceries,69.0
-,groceries,125.0
-,groceries,69.0
-,others,2000.0
-,transportation,30.0
-,groceries,1525.0
-,groceries,12.0
-,others,130.0
-,others,120.0
-,others,3690.0
-,transportation,34.0
-,transportation,30.0
-,transportation,40.0
-,groceries,39.0
-,groceries,26.0
-,others,72.0
-,others,20.0
-,others,67.0
-,others,100.0
-,groceries,40.0
-,groceries,70.0
-,others,539.0
-,groceries,130.0
-,groceries,70.0
-,groceries,39.0
-,transportation,15.0
-,entertainment,200.0
-,entertainment,2700.0
-,groceries,20.0
-,others,130.0
-,entertainment,296.0
-,others,10000.0
-,transportation,658.6
-,others,14.0
-,groceries,230.0
-,groceries,280.0
-,entertainment,5640.0
-,others,6500.0
-,others,3198.0
-,others,468.0
-,others,200.0
-,entertainment,2700.0
-,others,50.0
-,others,400.0
-,others,3055.0
-,others,2000.0
-,entertainment,149.0
-,others,10000.0
-,groceries,66.0
-,transportation,60.0
-,transportation,2598.0
-,others,2500.0
-,groceries,285.0
-,transportation,100.0
-,transportation,30.0
-,groceries,93.0
-,others,514.0
-,others,45.0
-,transportation,1440.0
-,groceries,196.0
-,others,500.0
-,others,20.0
-,groceries,140.0
-,entertainment,2700.0
-,others,50.0
-,groceries,40.0
-,others,15.0
-,entertainment,170.0
-,others,820.0
-,groceries,66.0
-,others,10000.0
-,entertainment,800.0
-,transportation,1665.0
-,others,500.0
-,transportation,470.0
-,transportation,100.0
-,transportation,330.0
-,transportation,60.0
-,others,76.0
-,groceries,66.0
-,others,218.0
-,others,125.0
-,others,43000.0
-,groceries,66.0
-,others,5000.0
-,groceries,33.0
-,others,22.0
-,entertainment,170.0
-,others,302.0
-,groceries,5.0
-,groceries,25.0
-,others,909.0
-,others,1145.0
-,others,989.0
-,others,27.0
-,others,100.0
-,others,6190.0
-,entertainment,2999.0
-,groceries,68.0
-,entertainment,170.0
-,entertainment,2700.0
-,groceries,14.0
-,groceries,66.0
-,others,399.0
-,others,10.0
-,others,10000.0
-,others,500.0
-,groceries,64.0
-,groceries,15.0
-,others,10.0
-,others,5000.0
-,others,1500.0
-,groceries,50.0
-,others,2923.0
-,groceries,20.0
-,groceries,20.0
-,transportation,12.0
-,transportation,80.0
-,transportation,30.0
-,groceries,30.0
-,groceries,26.0
-,groceries,64.0
-,groceries,115.0
-,groceries,100.0
-,groceries,180.0
-,groceries,45.0
-,groceries,25.0
-,entertainment,2700.0
-,transportation,60.0
-,groceries,35.0
-,groceries,64.0
-,others,5.0
-,entertainment,170.0
-,groceries,140.0
-,transportation,1711.0
-,others,10000.0
-,others,100.0
-,groceries,64.0
-,others,386.0
-,transportation,501.0
-,entertainment,170.0
-,transportation,30.0
-,transportation,30.0
-,others,760.0
-,groceries,35.0
-,groceries,64.0
-,groceries,35.0
-,others,26.0
-,others,3.0
-,groceries,40.0
-,groceries,64.0
-,groceries,180.0
-,groceries,20.0
-,others,18.0
-,others,190.0
-,others,2500.0
-,groceries,25.0
-,groceries,64.0
-,groceries,20.0
-,others,267.0
-,groceries,242.95
-,entertainment,2700.1
-,groceries,20.0
-,groceries,141.0
-,groceries,24.0
-,groceries,65.0
-,others,1000.0
-,others,10000.0
-,entertainment,261.0
-,groceries,10.0
-,groceries,20.0
-,groceries,10.0
-,others,5000.0
-,groceries,233.0
-,entertainment,230.0
-,groceries,10.0
-,others,318.0
-,others,100.0
-,others,12.0
-,others,24.0
-,groceries,20.0
-,groceries,125.0
-,groceries,45.0
-,groceries,34.0
-,groceries,40.0
-,groceries,10.0
-,groceries,20.0
-,groceries,45.0
-,groceries,191.0
-,groceries,35.0
-,groceries,30.0
-,groceries,98.0
-,entertainment,296.0
-,groceries,45.0
-,groceries,25.0
-,groceries,20.0
-,groceries,10.0
-,groceries,330.0
-,groceries,45.0
-,groceries,20.0
-,groceries,33.0
-,entertainment,296.0
-,transportation,15.0
-,transportation,60.0
-,transportation,30.0
-,transportation,10.0
-,others,8825.0
-,others,1811.0
-,transportation,1100.0
-,entertainment,2700.1
-,others,40.0
-,others,2421.0
-,groceries,20.0
-,groceries,64.0
-,others,1000.0
-,groceries,321.0
-,transportation,30.0
-,transportation,10.0
-,transportation,30.0
-,others,399.0
-,others,599.0
-,others,100.0
-,groceries,47.0
-,others,10000.0
-,entertainment,261.0
-,groceries,125.0
-,groceries,20.0
-,transportation,213.6
-,groceries,45.0
-,groceries,60.0
-,entertainment,2700.1
-,groceries,40.0
-,groceries,10.0
-,groceries,52.0
-,others,10000.0
-,transportation,30.0
-,groceries,40.0
-,groceries,130.0
-,others,440.0
-,transportation,40.0
-,transportation,30.0
-,transportation,30.0
-,transportation,20.0
-,groceries,60.0
-,groceries,200.0
-,transportation,1599.98
-,entertainment,296.0
-,groceries,62.0
-,groceries,72.0
-,groceries,100.0
-,groceries,100.0
-,groceries,150.0
-,groceries,190.0
-,groceries,105.0
-,groceries,20.0
-,groceries,62.0
-,entertainment,2700.1
-,groceries,62.0
-,groceries,45.0
-,others,10.0
-,others,140.0
-,groceries,949.0
-,transportation,30.0
-,groceries,30.0
-,transportation,20.0
-,transportation,30.0
-,groceries,20.0
-,groceries,148.0
-,others,50.0
-,others,10000.0
-,others,850.0
-,others,75.0
-,groceries,10.0
-,others,1000.0
-,others,1499.0
-,groceries,30.0
-,groceries,140.0
-,groceries,195.0
-,groceries,110.0
-,transportation,40.0
-,groceries,10.0
-,transportation,330.0
-,others,38.0
-,groceries,60.0
-,groceries,53.0
-,groceries,30.0
-,others,8.0
-,groceries,412.25
-,groceries,12.0
-,groceries,10.0
-,groceries,50.0
-,entertainment,2700.1
-,groceries,1160.0
-,entertainment,301.0
-,entertainment,301.0
-,groceries,33.0
-,others,10000.0
-,groceries,45.0
-,others,90.0
-,groceries,160.0
-,groceries,99.0
-,others,80.0
-,entertainment,149.0
-,transportation,50.0
-,groceries,175.0
-,transportation,50.0
-,transportation,1396.5
-,groceries,294.0
-,groceries,31.0
-,others,200.0
-,groceries,48.0
-,others,100.0
-,groceries,31.0
-,entertainment,301.0
-,groceries,40.0
-,entertainment,2816.92
-,groceries,140.0
-,groceries,50.0
-,groceries,20.0
-,groceries,31.0
-,groceries,310.0
-,groceries,70.0
-,groceries,330.0
-,others,400.0
-,transportation,20.0
-,transportation,30.0
-,transportation,60.0
-,others,110.0
-,groceries,386.0
-,groceries,510.0
-,others,354.0
-,groceries,40.0
-,others,50.0
-,groceries,340.0
-,others,300.0
-,others,100000.0
-,others,45.0
-,others,200.0
-,others,257.0
-,groceries,30.0
-,others,1000.0
-,others,1000.0
-,entertainment,301.0
-,groceries,30.0
-,others,199.0
-,others,1000.0
-,others,155.0
-,others,1000.0
-,others,1000.0
-,groceries,25.0
-,groceries,10.0
-,groceries,8.0
-,groceries,30.0
-,groceries,25.0
-,groceries,50.0
-,groceries,90.0
-,groceries,15.0
-,groceries,45.0
-,groceries,20.0
-,groceries,55.0
-,groceries,20.0
-,others,40000.0
-,others,10000.0
-,others,55.0
-,groceries,10.0
-,transportation,40.0
-,others,1000.0
-,others,11286.0
-,others,1000.0
-,others,1000.0
-,others,10.0
-,entertainment,199.0
-,groceries,45.0
-,transportation,30.0
-,others,1000.0
-,others,1000.0
-,entertainment,50.0
-,groceries,240.0
-,others,470.0
-,others,700.0
-,others,80.0
-,entertainment,450.0
-,groceries,50.0
-,others,10000.0
-,others,10000.0
-,groceries,150.0
-,groceries,100.0
-,others,1000.0
-,others,1000.0
-,others,1000.0
-,others,249.0
-,others,40.0
-,transportation,80.0
-,groceries,90.0
-,others,174.0
-,entertainment,199.0
-,others,1000.0
-,others,1000.0
-,entertainment,200.0
-,others,10000.0
-,others,10000.0
-,groceries,35.0
-,groceries,35.0
-,groceries,20.0
-,groceries,70.0
-,groceries,35.0
-,transportation,20.0
-,others,1000.0
-,others,1000.0
-,groceries,70.0
-,groceries,30.0
-,groceries,20.0
+2025-11-30 00:00:00,groceries,2500.0
+2025-11-30 00:00:00,transportation,500.0
+2025-11-30 00:00:00,utilities,200.0
 ,entertainment,251.0
-,groceries,72.0
-,others,1000.0
-,transportation,598.5
-,others,1000.0
-,others,1000.0
-,transportation,750.0
-,entertainment,251.0
-,others,10000.0
-,others,10000.0
-,others,11286.0
-,others,1000.0
-,others,1000.0
-,entertainment,251.0
-,others,1000.0
-,others,750.0
-,others,1000.0
-,others,1000.0
-,others,260.0
-,others,10000.0
-,others,15000.0
-,others,1000.0
-,others,1000.0
-,others,1000.0
-,others,1000.0
-,others,1000.0
-,entertainment,251.0
-,entertainment,251.0
-,others,2599.0
-,others,10000.0
-,others,15000.0
-,groceries,84.0
-,entertainment,251.0
-,others,1000.0
-,others,1000.0
-,others,1000.0
-,others,1000.0
-,others,1000.0
-,groceries,68.0
-,others,10000.0
-,others,10000.0
-,groceries,25.0
-,others,1000.0
-,others,1000.0
-,others,1000.0
-,entertainment,251.0
-,others,1000.0
-,others,1000.0
-,entertainment,251.0
-,others,25.0
-,others,10000.0
-,others,10000.0
-,others,1000.0
-,others,1000.0
-,entertainment,251.0
-,groceries,1279.0
-,others,1000.0
-,others,1000.0
-,others,1000.0
-,entertainment,300.0
-,entertainment,251.0
-,groceries,20.0
-,transportation,50.0
-,others,30.0
-,others,10000.0
-,others,10000.0
-,groceries,60.0
-,others,250.0
-,others,20.0
-,others,1000.0
-,others,1000.0
-,others,1000.0
-,entertainment,251.0
-,others,1000.0
-,others,1000.0
-,others,10000.0
-,others,1000.0
-,others,1000.0
-,others,1000.0
-,entertainment,251.0
-,groceries,160.0
-,others,1000.0
-,others,1000.0
-,others,10000.0
-,others,200.0
-,others,1000.0
-,others,1000.0
-,others,15.0
-,entertainment,251.0
-,others,1994.0
-,others,1000.0
-,others,1000.0
-,others,1000.0
-,groceries,350.0
-,transportation,30.0
-,groceries,35.0
-,others,10000.0
-,others,10000.0
-,groceries,192.0
-,transportation,50.0
-,transportation,100.0
-,others,1000.0
-,others,1000.0
-,others,28.0
-,others,1000.0
-,others,1000.0
-,groceries,90.0
-,others,200.0
-,others,1000.0
-,others,325.0
-,others,773.0
-,groceries,84.0
-,others,50000.0
-,others,10000.0
-,others,1024.0
-,groceries,25.0
-,others,1000.0
-,others,1000.0
-,others,1000.0
-,others,251.0
-,others,1000.0
-,others,1000.0
-,groceries,84.0
-,others,10000.0
-,transportation,40.0
-,others,10000.0
-,transportation,70.0
-,others,1000.0
-,others,1000.0
-,others,1000.0
-,others,8029.0
-,others,1000.0
-,others,1000.0
-,groceries,420.0
-,others,10000.0
-,groceries,379.0
-,others,1000.0
-,others,1000.0
-,others,1000.0
-,others,1000.0
-,others,1000.0
-,others,10000.0
-,others,1000.0
-,others,1000.0
-,others,1000.0
-,others,1000.0
-,others,1000.0
-,others,333.0
-,others,10000.0
-,others,10000.0
-,others,2500.0
-,others,1000.0
-,others,1000.0
-,others,459.0
-,others,1000.0
-,others,1000.0
-,others,1000.0
-,others,312.0
-,others,333.0
-,others,2833.0
-,others,10000.0
-,others,10000.0
-,others,1000.0
-,others,1000.0
-,others,50.0
-,others,1000.0
-,others,1000.0
-,others,1000.0
-,others,776.0
-,others,2543.0
-,others,10000.0
-,groceries,26.0
-,others,1000.0
-,others,1000.0
-,groceries,20.0
-,groceries,26.0
-,others,160.0
-,others,290.0
-,groceries,52.0
-,groceries,20.0
-,groceries,26.0
-,others,1000.0
-,others,70.0
-,others,1000.0
-,others,1000.0
-,groceries,100.0
-,groceries,26.0
-,others,20000.0
-,groceries,1178.0
-,others,5000.0
-,others,10000.0
-,groceries,28.0
-,groceries,20.0
-,groceries,699.0
-,groceries,156.0
-,others,1000.0
-,others,1000.0
-,others,1000.0
-,others,10000.0
-,groceries,287.0
-,groceries,889.0
-,others,300.0
-,others,50.0
-,others,5000.0
-,groceries,50.0
-,others,1900.0
-,groceries,30.0
-,others,1000.0
-,groceries,8.0
-,transportation,11.8
-,others,1000.0
-,transportation,11.8
-,transportation,20.0
-,transportation,10.0
-,transportation,20.0
-,others,129.0
-,others,6.0
-,others,1000.0
-,others,1000.0
-,transportation,10.0
-,groceries,25.0
-,transportation,10.0
-,others,1000.0
-,others,40.0
-,groceries,25.0
 ,utilities,108.0
-,others,17.0
-,others,333.0
-,others,1667.0
-,others,82.0
-,others,3000.0
-,groceries,30.0
-,others,10000.0
-,others,2833.0
-,others,226.0
-,others,300.0
-,groceries,25.0
-,transportation,10.0
-,groceries,40.0
-,groceries,20.0
-,groceries,80.0
-,groceries,88.0
-,groceries,6.0
-,groceries,10.0
-,groceries,12.0
-,groceries,10.0
-,groceries,54.0
-,groceries,26.0
-,groceries,60.0
-,groceries,18.0
-,groceries,6.0
-,groceries,35.0
-,groceries,150.0
-,transportation,176.0
-,groceries,86.0
-,others,371.0
-,others,3400.0
-,groceries,30.0
-,groceries,6.0
-,groceries,375.0
-,groceries,40.0
-,groceries,21.0
-,groceries,1178.0
-,groceries,30.0
-,groceries,26.0
-,groceries,70.0
-,groceries,10.0
-,groceries,107.0
-,others,100.0
-,groceries,27.0
-,others,50.0
-,others,10000.0
-,groceries,26.0
-,groceries,30.0
-,groceries,26.0
-,others,784.0
-,others,248.0
-,transportation,175.0
-,transportation,61.0
-,others,50.0
-,transportation,170.0
-,transportation,50.0
-,transportation,650.0
-,others,50.0
-,groceries,20.0
-,groceries,20.0
-,others,650.0
-,groceries,20.0
-,groceries,31.0
-,groceries,15.0
-,groceries,15.0
-,others,2833.0
-,others,333.0
-,groceries,135.0
-,others,2250.0
-,groceries,35.0
-,groceries,20.0
-,groceries,175.0
-,others,10000.0
-,others,223.0
-,groceries,350.0
-,groceries,49.0
-,groceries,66.0
-,others,10000.0
-,groceries,28.0
-,groceries,10.0
-,groceries,400.0
-,transportation,20.0
-,transportation,60.0
 ,others,40.0
-,groceries,200.0
-,transportation,142.0
-,transportation,20.0
-,transportation,20.0
-,transportation,30.0
 ,groceries,10.0
 ,transportation,10.0

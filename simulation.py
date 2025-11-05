@@ -10,6 +10,7 @@ Features:
  - Interactive CLI for prediction or monthly-entry data addition
  - Auto retraining when user adds monthly entries or provides a CSV
  - Budget check summary with LSTM / Moving Average / Holt-Winters breakdown
+ - Predictive Insights (risk classification and top contributors)
  - Unified output file (outputs/predictions_summary.csv)
 """
 
@@ -199,52 +200,112 @@ def predict_future(df, months, budget):
     print(f"\n✅ Predictions saved to {out_path}\n")
 
     # -----------------------
-    # New budget-check formatting requested by user
+    # Budget-check formatting
     # -----------------------
     if df_pred.empty:
         print("No predictions generated.")
-        return df_pred
+    else:
+        n_months = int(df_pred['month_ahead'].max())
 
-    n_months = int(df_pred['month_ahead'].max())
+        for m in range(1, n_months + 1):
+            print("1st Month" if m == 1 else f"Month +{m}:")
+            month_df = df_pred[df_pred["month_ahead"] == m]
 
-    for m in range(1, n_months + 1):
-        print("1st Month" if m == 1 else f"Month +{m}:")
-        month_df = df_pred[df_pred["month_ahead"] == m]
+            total_lstm = month_df["lstm"].sum()
+            total_ma = month_df["moving_average"].sum()
+            total_hw = month_df["holt_winters"].sum()
+            total_ensemble = month_df["ensemble"].sum()
+            total_best = month_df["best_pred"].sum()
 
-        total_lstm = month_df["lstm"].sum()
-        total_ma = month_df["moving_average"].sum()
-        total_hw = month_df["holt_winters"].sum()
-        total_ensemble = month_df["ensemble"].sum()
-        total_best = month_df["best_pred"].sum()
+            def status_and_diff(value, budget):
+                diff = value - budget
+                status = "🟢 within budget" if diff <= 0 else "🔴 over budget"
+                sign = f"+{diff:,.2f}" if diff > 0 else f"{diff:,.2f}"
+                return status, sign, diff
 
-        def status_and_diff(value, budget):
-            diff = value - budget
-            status = "🟢 within budget" if diff <= 0 else "🔴 over budget"
-            sign = f"+{diff:,.2f}" if diff > 0 else f"{diff:,.2f}"
-            return status, sign, diff
+            # Ensemble section shows each model totals and the ensemble total
+            print("📊 Budget Check (ensemble):")
+            status, sign, _ = status_and_diff(total_lstm, budget)
+            print(f"  LSTM           : ₱{total_lstm:,.2f} → {status} (diff {sign})")
+            status, sign, _ = status_and_diff(total_ma, budget)
+            print(f"  Moving Average : ₱{total_ma:,.2f} → {status} (diff {sign})")
+            status, sign, _ = status_and_diff(total_hw, budget)
+            print(f"  Holt-Winters   : ₱{total_hw:,.2f} → {status} (diff {sign})")
+            status_e, sign_e, _ = status_and_diff(total_ensemble, budget)
+            print(f"  Ensemble total : ₱{total_ensemble:,.2f} → {status_e} (diff {sign_e})\n")
 
-        # Ensemble section shows each model totals and the ensemble total
-        print("📊 Budget Check (ensemble):")
-        status, sign, _ = status_and_diff(total_lstm, budget)
-        print(f"  LSTM           : ₱{total_lstm:,.2f} → {status} (diff {sign})")
-        status, sign, _ = status_and_diff(total_ma, budget)
-        print(f"  Moving Average : ₱{total_ma:,.2f} → {status} (diff {sign})")
-        status, sign, _ = status_and_diff(total_hw, budget)
-        print(f"  Holt-Winters   : ₱{total_hw:,.2f} → {status} (diff {sign})")
-        status_e, sign_e, _ = status_and_diff(total_ensemble, budget)
-        print(f"  Ensemble total : ₱{total_ensemble:,.2f} → {status_e} (diff {sign_e})\n")
+            # Best-pred section shows same breakdown and the aggregated best_pred total
+            print("📊 Budget Check (best_pred):")
+            status, sign, _ = status_and_diff(total_lstm, budget)
+            print(f"  LSTM           : ₱{total_lstm:,.2f} → {status} (diff {sign})")
+            status, sign, _ = status_and_diff(total_ma, budget)
+            print(f"  Moving Average : ₱{total_ma:,.2f} → {status} (diff {sign})")
+            status, sign, _ = status_and_diff(total_hw, budget)
+            print(f"  Holt-Winters   : ₱{total_hw:,.2f} → {status} (diff {sign})")
+            status_b, sign_b, _ = status_and_diff(total_best, budget)
+            print(f"  Best Pred total: ₱{total_best:,.2f} → {status_b} (diff {sign_b})")
+            print("")  # spacer between months
 
-        # Best-pred section shows same breakdown and the aggregated best_pred total
-        print("📊 Budget Check (best_pred):")
-        status, sign, _ = status_and_diff(total_lstm, budget)
-        print(f"  LSTM           : ₱{total_lstm:,.2f} → {status} (diff {sign})")
-        status, sign, _ = status_and_diff(total_ma, budget)
-        print(f"  Moving Average : ₱{total_ma:,.2f} → {status} (diff {sign})")
-        status, sign, _ = status_and_diff(total_hw, budget)
-        print(f"  Holt-Winters   : ₱{total_hw:,.2f} → {status} (diff {sign})")
-        status_b, sign_b, _ = status_and_diff(total_best, budget)
-        print(f"  Best Pred total: ₱{total_best:,.2f} → {status_b} (diff {sign_b})")
-        print("")  # spacer between months
+    # -----------------------
+    # Predictive Insights Section
+    # -----------------------
+    # Uses processed df (passed into predict_future) to compute past averages
+    print("\n🔮 Predictive Insights — Smart Budget Analysis\n")
+
+    # Compute total predicted spend per category (sum of ensemble predictions)
+    predicted_totals = df_pred.groupby("category")["ensemble"].sum() if not df_pred.empty else pd.Series(dtype=float)
+
+    # Compute average historical monthly spending
+    past_avg = (
+        df.groupby("category")["amount"]
+        .mean()
+        .reindex(predicted_totals.index)
+        .fillna(0.0)
+    )
+
+    # Compute percentage change from past average to predicted
+    # Avoid division by zero: replace zeros with NaN for ratio calculation
+    past_avg_nonzero = past_avg.replace(0, np.nan)
+    change_pct = (predicted_totals / past_avg_nonzero) * 100
+
+    insights = []
+    for cat in predicted_totals.index if not predicted_totals.empty else []:
+        pred_val = float(predicted_totals[cat])
+        avg_val = float(past_avg[cat])
+        pct = float(change_pct[cat]) if not np.isnan(change_pct[cat]) else 0.0
+        if avg_val == 0:
+            trend = "⚪ new category (no past data)"
+            risk = "neutral"
+        elif pct > 120:
+            trend = "🔴 Overspending risk (↑ {:.1f}%)".format(pct - 100)
+            risk = "high"
+        elif pct > 90:
+            trend = "🟡 Stable spending ({:.1f}%)".format(pct)
+            risk = "medium"
+        else:
+            trend = "🟢 Improving (↓ {:.1f}%)".format(100 - pct)
+            risk = "low"
+        insights.append((cat, avg_val, pred_val, trend, risk))
+
+    if insights:
+        df_insights = pd.DataFrame(insights, columns=["Category", "Past Avg", "Predicted", "Trend", "Risk Level"])
+
+        # Display insights nicely
+        for _, row in df_insights.iterrows():
+            print(f"📂 {row['Category'].capitalize():15} | Past ₱{row['Past Avg']:,.2f} → Pred ₱{row['Predicted']:,.2f} | {row['Trend']}")
+
+        # Highlight top categories contributing to total predicted spend
+        top_cats = predicted_totals.sort_values(ascending=False).head(3)
+        print("\n🏆 Top 3 Spending Contributors (Predicted):")
+        for i, (cat, val) in enumerate(top_cats.items(), 1):
+            print(f"  {i}. {cat.capitalize()} — ₱{val:,.2f}")
+
+        # Save insights CSV for later reference
+        insights_path = OUTPUTS_DIR / "predictive_insights.csv"
+        df_insights.to_csv(insights_path, index=False)
+        print(f"\n✅ Predictive insights saved to {insights_path}\n")
+    else:
+        print("No predictive insights (no predicted totals).")
 
     return df_pred
 
@@ -258,7 +319,6 @@ def main():
     choice = input("Type 'predict' to forecast, 'add' to add new data, or 'both': ").strip().lower()
 
     if choice in ("add", "both"):
-        # Ask for a CSV path, but allow empty input to trigger manual monthly entry
         new_csv = input("Enter path to new data CSV (leave empty to add monthly transactions manually): ").strip()
         if new_csv:
             new_path = Path(new_csv)
@@ -275,10 +335,11 @@ def main():
                     df = load_cleaned_data()
                     print("✅ Data appended from CSV and models retrained.")
         else:
-            # Interactive monthly-entry -> append into processed file
+            # Interactive monthly-entry → append into processed file
             append_and_retrain(new_data=None, retrain_all=False, freq="ME")
             df = load_cleaned_data()
             print("✅ Manual monthly transactions appended and models retrained.")
+
 
     if choice in ("predict", "both"):
         # ensure df is up-to-date
@@ -298,12 +359,14 @@ def main():
         # Optional visualization
         view = input("View chart? (y/n): ").strip().lower()
         if view == "y":
-            summary = df_pred.groupby("category")["ensemble"].sum().sort_values()
-            summary.plot(kind="barh", title="Predicted Total (Next Months)", figsize=(8, 5))
-            plt.xlabel("Predicted Spending (₱)")
-            plt.tight_layout()
-            plt.show()
-
+            if not df_pred.empty:
+                summary = df_pred.groupby("category")["ensemble"].sum().sort_values()
+                summary.plot(kind="barh", title="Predicted Total (Next Months)", figsize=(8, 5))
+                plt.xlabel("Predicted Spending (₱)")
+                plt.tight_layout()
+                plt.show()
+            else:
+                print("No predictions to plot.")
 
 if __name__ == "__main__":
     main()

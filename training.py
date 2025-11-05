@@ -211,30 +211,22 @@ def train_all(freq: str = "ME"):
 # Append new data directly into processed cleaned CSV and retrain
 # =====================================================
 
-def append_and_retrain(
-    new_data: pd.DataFrame | None = None,
-    freq: str = "ME",
-    retrain_all: bool = False
-):
+def append_and_retrain(new_data=None, retrain_all=False, freq="ME"):
     """
-    Appends new transaction data directly into the processed dataset
-    (data/processed/cleaned_transactions.csv), then retrains models.
-
-    Interactive mode (new_data is None): prompts user to enter monthly records:
-      - Month (YYYY-MM)  [press Enter to finish]
-      - Category
-      - Amount
-
-    Each entry is converted to a month-end date before appending.
+    Append new user data (from CSV or manual entry) to processed dataset,
+    then retrain models for affected categories.
     """
-    # Ensure processed data exists
-    if not DATA_PATH.exists():
-        raise FileNotFoundError(f"Processed file not found: {DATA_PATH}")
+    from pandas.tseries.offsets import MonthEnd
 
-    df_main = pd.read_csv(DATA_PATH, parse_dates=["date"])
-    df_main["category"] = df_main["category"].astype(str).str.lower().str.strip()
+    processed_path = os.path.join("data", "processed", "cleaned_transactions.csv")
+    if not os.path.exists(processed_path):
+        print(f"⚠️ No existing processed data found at {processed_path}.")
+        return
 
-    # --- Gather new data (interactive or provided DataFrame) ---
+    df = pd.read_csv(processed_path, parse_dates=["date"])
+    df["category"] = df["category"].astype(str).str.lower().str.strip()
+
+    # --- Interactive data entry (manual monthly mode) ---
     if new_data is None:
         print("\n🆕 Add monthly transactions (enter blank Month to finish).")
         entries = []
@@ -242,22 +234,28 @@ def append_and_retrain(
             month_str = input("Month (YYYY-MM) or ENTER to finish: ").strip()
             if not month_str:
                 break
-            # accept YYYY-MM or YYYY/MM
+
+            # Allow YYYY/MM as well
             month_str = month_str.replace("/", "-")
+
+            # Robust month parsing
             try:
-                # create first-of-month then convert to month-end
                 ts = pd.to_datetime(month_str + "-01", errors="coerce")
                 if pd.isna(ts):
                     raise ValueError("Invalid month format")
-                month_end = ts.to_period("M").to_timestamp("ME")
+                # Convert to month-end safely (avoid deprecated 'ME')
+                month_end = (ts + MonthEnd(0)).normalize()
             except Exception as e:
                 print(f"  ❌ Could not parse month '{month_str}': {e}. Try format YYYY-MM (e.g. 2025-11).")
                 continue
 
+            # Category
             cat = input("Category: ").strip().lower()
             if not cat:
                 print("  ❌ Category cannot be empty. Try again.")
                 continue
+
+            # Amount
             amt_str = input("Amount (₱): ").strip()
             try:
                 amt = float(amt_str) if amt_str else 0.0
@@ -269,68 +267,57 @@ def append_and_retrain(
             print(f"  ✓ Added: {month_end.date()} | {cat} | ₱{amt:.2f}")
 
         if not entries:
-            print("No new monthly entries added.")
-            return None
+            print("⚠️ No new data entered. Nothing to update.")
+            return
 
-        new_data = pd.DataFrame(entries)
-        # ensure date dtype
-        new_data["date"] = pd.to_datetime(new_data["date"])
+        new_df = pd.DataFrame(entries)
+
     else:
-        # If DataFrame given, normalize column names if needed
-        new_data = new_data.copy()
-        if "date" not in new_data.columns:
-            # try to detect a date-like column
-            for c in new_data.columns:
-                if "date" in c.lower() or "time" in c.lower():
-                    new_data = new_data.rename(columns={c: "date"})
-                    break
-        if "category" not in new_data.columns:
-            for c in new_data.columns:
-                if "cat" in c.lower():
-                    new_data = new_data.rename(columns={c: "category"})
-                    break
-        if "amount" not in new_data.columns:
-            for c in new_data.columns:
-                if "amount" in c.lower() or "amt" in c.lower() or "value" in c.lower():
-                    new_data = new_data.rename(columns={c: "amount"})
-                    break
+        # CSV path or DataFrame provided externally
+        new_df = new_data.copy()
+        if "date" not in new_df.columns or "category" not in new_df.columns or "amount" not in new_df.columns:
+            print("⚠️ CSV must contain columns: date, category, amount.")
+            return
+        new_df["date"] = pd.to_datetime(new_df["date"], errors="coerce")
+        new_df["category"] = new_df["category"].astype(str).str.lower().str.strip()
 
-        # convert month-like date strings to month-end if they look like YYYY-MM
-        if new_data["date"].dtype == object:
-            # try parse; if a month string like '2025-11' produce month-end
-            parsed = pd.to_datetime(new_data["date"], errors="coerce")
-            # if parsing yields NaT for some rows, try appending '-01' then month-end
-            mask_nat = parsed.isna()
-            if mask_nat.any():
-                alt = pd.to_datetime(new_data.loc[mask_nat, "date"].astype(str) + "-01", errors="coerce")
-                parsed.loc[mask_nat] = alt
-            new_data["date"] = parsed
-        new_data["category"] = new_data["category"].astype(str).str.lower().str.strip()
-        new_data["amount"] = pd.to_numeric(new_data["amount"], errors="coerce").fillna(0.0)
+    # --- Append & deduplicate ---
+    updated_df = pd.concat([df, new_df], ignore_index=True).drop_duplicates(subset=["date", "category"], keep="last")
+    updated_df.sort_values("date", inplace=True)
+    updated_df.to_csv(processed_path, index=False)
+    print(f"\n✅ Updated processed data saved → {processed_path}")
 
-    # --- Validate and merge ---
-    affected = sorted(new_data["category"].dropna().unique().tolist())
+    # --- Retrain affected categories ---
+    affected_cats = sorted(new_df["category"].dropna().unique().tolist())
+    if not affected_cats:
+        print("No affected categories detected; nothing to retrain.")
+        return
 
-    # Append to processed file and save
-    df_updated = pd.concat([df_main, new_data[["date", "category", "amount"]]], ignore_index=True)
-    df_updated = df_updated.sort_values("date").reset_index(drop=True)
-    df_updated.to_csv(DATA_PATH, index=False)
-    print(f"\n✅ Appended {len(new_data)} new rows into {DATA_PATH}")
-    print(f"Affected categories: {affected}")
+    print(f"\n🔁 Retraining models for categories: {affected_cats}")
 
-    # --- Retrain ---
-    if retrain_all:
-        print("\n🔁 Retraining all categories...")
-        return train_all(freq=freq)
-    else:
-        print("\n🔁 Retraining affected categories only...")
-        results = {}
-        grouped = aggregate_series(df_updated, freq=freq)
-        for cat, series in grouped.items():
-            if cat in affected:
-                results[cat] = train_models_for_category(cat, series)
-        print("\n✅ Partial retraining complete.")
-        return results
+    # For each affected category, build a time series at the requested freq and train
+    for cat in affected_cats:
+        cat_df = updated_df[updated_df["category"] == cat].copy()
+        # aggregate using the provided freq (e.g., "ME" for month-end or "W-MON" for weekly)
+        try:
+            series = cat_df.set_index("date")["amount"].resample(freq).sum().sort_index()
+            series = series.fillna(0.0)
+        except Exception as e:
+            print(f"  ⚠️ Failed to resample for {cat} with freq='{freq}': {e}. Skipping.")
+            continue
+
+        # train_models_for_category expects (category, series)
+        try:
+            res = train_models_for_category(cat, series)
+            ok_any = any(res.values()) if isinstance(res, dict) else bool(res)
+            if ok_any:
+                print(f"  ✅ Retrained models for category: {cat}")
+            else:
+                print(f"  ⚠️ Retraining skipped/failed for {cat} (insufficient data or error).")
+        except Exception as e:
+            print(f"  ⚠️ Error while retraining {cat}: {e}")
+
+    print("\nAll done — data updated and models refreshed.")
 
 
 
