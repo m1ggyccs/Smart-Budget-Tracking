@@ -1,7 +1,7 @@
 from functools import lru_cache
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
-from pydantic import field_validator
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -19,14 +19,19 @@ class Settings(BaseSettings):
 
     database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/smart_budget"
 
-    cors_origins: List[str] = ["http://localhost:5173"]
+    cors_origins: Union[List[str], str] = Field(default_factory=lambda: ["http://localhost:5173"])
+    model_directory: str = Field(default="models")
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
     @field_validator("cors_origins", mode="before")
     @classmethod
     def split_cors_origins(cls, value: Any) -> List[str]:
+        if value is None:
+            return ["http://localhost:5173"]
         if isinstance(value, str):
+            if not value.strip():
+                return []
             return [origin.strip() for origin in value.split(",") if origin.strip()]
         if isinstance(value, list):
             return value
