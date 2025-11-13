@@ -1,13 +1,20 @@
 from datetime import date
+from decimal import Decimal
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.api.routes.auth import get_current_active_user
 from app.db.session import get_db
 from app.models.user import Transaction, TransactionType, User
-from app.schema.transaction import TransactionCreate, TransactionRead, TransactionUpdate
+from app.schema.transaction import (
+    TransactionCreate,
+    TransactionRead,
+    TransactionSummary,
+    TransactionUpdate,
+)
 
 router = APIRouter(prefix="/transactions", tags=["transactions"])
 
@@ -94,6 +101,43 @@ def update_transaction(
     db.commit()
     db.refresh(transaction)
     return TransactionRead.model_validate(transaction)
+
+
+@router.get("/summary", response_model=TransactionSummary)
+def transaction_summary(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+    start_date: Optional[date] = Query(default=None),
+    end_date: Optional[date] = Query(default=None),
+) -> TransactionSummary:
+    query = db.query(
+        Transaction.transaction_type,
+        func.coalesce(func.sum(Transaction.amount), 0).label("total"),
+    ).filter(Transaction.user_id == current_user.id)
+
+    if start_date is not None:
+        query = query.filter(Transaction.occurred_at >= start_date)
+    if end_date is not None:
+        query = query.filter(Transaction.occurred_at <= end_date)
+
+    query = query.group_by(Transaction.transaction_type)
+
+    totals = {
+        TransactionType.EXPENSE: Decimal("0"),
+        TransactionType.INCOME: Decimal("0"),
+    }
+    for row in query.all():
+        totals[row.transaction_type] = Decimal(row.total)
+
+    expense_total: Decimal = totals[TransactionType.EXPENSE]
+    income_total: Decimal = totals[TransactionType.INCOME]
+    net: Decimal = income_total - expense_total
+
+    return TransactionSummary(
+        total_expense=expense_total,
+        total_income=income_total,
+        net=net,
+    )
 
 
 @router.delete("/{transaction_id}", status_code=status.HTTP_204_NO_CONTENT)

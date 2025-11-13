@@ -33,3 +33,9 @@ class TransactionRead(TransactionBase):
     class Config:
         from_attributes = True
 
+
+class TransactionSummary(BaseModel):
+    total_expense: Decimal = Field(default=0)
+    total_income: Decimal = Field(default=0)
+    net: Decimal = Field(default=0)
+
