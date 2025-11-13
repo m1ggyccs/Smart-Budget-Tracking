@@ -13,7 +13,7 @@ class ForecastModelService:
 
     def __init__(self, model_dir: Path | None = None) -> None:
         settings = get_settings()
-        self.model_dir = self._resolve_model_dir(model_dir, settings.model_directory)
+        self.model_dir = self._resolve_model_dir(model_dir, settings.models_directory)
         self._holt_winters_models: Dict[str, Any] = {}
         self._moving_average_configs: Dict[str, Dict[str, Any]] = {}
 

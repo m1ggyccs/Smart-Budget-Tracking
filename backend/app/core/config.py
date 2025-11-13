@@ -20,7 +20,10 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/smart_budget"
 
     cors_origins: Union[List[str], str] = Field(default_factory=lambda: ["http://localhost:5173"])
-    model_directory: str = Field(default="models")
+    models_directory: str = Field(default="models")
+    secret_key: str = Field(default="change-me")
+    jwt_algorithm: str = Field(default="HS256")
+    access_token_expire_minutes: int = Field(default=60)
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
