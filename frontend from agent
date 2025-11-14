@@ -1,0 +1,595 @@
+import React, { useState, useEffect } from 'react';
+import { PlusCircle, TrendingUp, TrendingDown, Wallet, PieChart, BarChart3, Calendar, DollarSign, Tag, FileText, LogOut, User, Settings, ChevronRight, AlertCircle, CheckCircle } from 'lucide-react';
+
+const API_BASE = 'http://localhost:8000/v1';
+
+const M1GBudgetTracker = () => {
+  const [currentView, setCurrentView] = useState('login');
+  const [token, setToken] = useState(null);
+  const [user, setUser] = useState(null);
+  const [budgets, setBudgets] = useState([]);
+  const [transactions, setTransactions] = useState([]);
+  const [analytics, setAnalytics] = useState(null);
+  const [loading, setLoading] = useState(false);
+  
+  // Form states
+  const [authForm, setAuthForm] = useState({ email: '', password: '', name: '' });
+  const [budgetForm, setBudgetForm] = useState({ amount: '', period: 'monthly', alerts_enabled: true });
+  const [transactionForm, setTransactionForm] = useState({ 
+    amount: '', 
+    category: 'Food', 
+    transaction_type: 'expense', 
+    occurred_at: new Date().toISOString().split('T')[0],
+    notes: '' 
+  });
+  const [forecastCategory, setForecastCategory] = useState('Food');
+  const [forecast, setForecast] = useState(null);
+
+  const categories = ['Food', 'Transport', 'Entertainment', 'Shopping', 'Bills', 'Healthcare', 'Other'];
+
+  useEffect(() => {
+    if (token) {
+      fetchDashboardData();
+    }
+  }, [token]);
+
+  const apiCall = async (endpoint, method = 'GET', body = null, useAuth = true) => {
+    const headers = { 'Content-Type': 'application/json' };
+    if (useAuth && token) headers['Authorization'] = `Bearer ${token}`;
+    
+    const config = { method, headers };
+    if (body) config.body = JSON.stringify(body);
+    
+    const res = await fetch(`${API_BASE}${endpoint}`, config);
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+  };
+
+  const handleLogin = async () => {
+    setLoading(true);
+    try {
+      const formData = new URLSearchParams();
+      formData.append('username', authForm.email);
+      formData.append('password', authForm.password);
+      
+      const res = await fetch(`${API_BASE}/auth/token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formData
+      });
+      
+      if (!res.ok) throw new Error('Login failed');
+      const data = await res.json();
+      setToken(data.access_token);
+      setUser({ email: authForm.email });
+      setCurrentView('dashboard');
+    } catch (err) {
+      alert('Login failed: ' + err.message);
+    }
+    setLoading(false);
+  };
+
+  const handleRegister = async () => {
+    setLoading(true);
+    try {
+      await apiCall('/auth/register', 'POST', {
+        email: authForm.email,
+        password: authForm.password,
+        name: authForm.name
+      }, false);
+      alert('Registration successful! Please login.');
+      setCurrentView('login');
+    } catch (err) {
+      alert('Registration failed: ' + err.message);
+    }
+    setLoading(false);
+  };
+
+  const fetchDashboardData = async () => {
+    setLoading(true);
+    try {
+      const [budgetsData, transactionsData, analyticsData] = await Promise.all([
+        apiCall('/budgets'),
+        apiCall('/transactions'),
+        apiCall('/analytics/insights')
+      ]);
+      setBudgets(budgetsData);
+      setTransactions(transactionsData);
+      setAnalytics(analyticsData);
+    } catch (err) {
+      console.error('Failed to fetch data:', err);
+    }
+    setLoading(false);
+  };
+
+  const handleAddBudget = async () => {
+    setLoading(true);
+    try {
+      await apiCall('/budgets', 'POST', {
+        amount: parseFloat(budgetForm.amount),
+        period: budgetForm.period,
+        alerts_enabled: budgetForm.alerts_enabled
+      });
+      setBudgetForm({ amount: '', period: 'monthly', alerts_enabled: true });
+      await fetchDashboardData();
+      setCurrentView('dashboard');
+    } catch (err) {
+      alert('Failed to add budget: ' + err.message);
+    }
+    setLoading(false);
+  };
+
+  const handleAddTransaction = async () => {
+    setLoading(true);
+    try {
+      await apiCall('/transactions', 'POST', {
+        amount: parseFloat(transactionForm.amount),
+        category: transactionForm.category,
+        transaction_type: transactionForm.transaction_type,
+        occurred_at: transactionForm.occurred_at,
+        notes: transactionForm.notes
+      });
+      setTransactionForm({ 
+        amount: '', 
+        category: 'Food', 
+        transaction_type: 'expense', 
+        occurred_at: new Date().toISOString().split('T')[0],
+        notes: '' 
+      });
+      await fetchDashboardData();
+      setCurrentView('dashboard');
+    } catch (err) {
+      alert('Failed to add transaction: ' + err.message);
+    }
+    setLoading(false);
+  };
+
+  const handleGetForecast = async () => {
+    setLoading(true);
+    try {
+      const data = await apiCall('/analytics/forecast', 'POST', { category: forecastCategory });
+      setForecast(data);
+    } catch (err) {
+      alert('Failed to get forecast: ' + err.message);
+    }
+    setLoading(false);
+  };
+
+  const handleLogout = () => {
+    setToken(null);
+    setUser(null);
+    setCurrentView('login');
+    setBudgets([]);
+    setTransactions([]);
+    setAnalytics(null);
+  };
+
+  // Auth Views
+  if (currentView === 'login' || currentView === 'register') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl mb-4">
+              <Wallet className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              M1G Budget Tracker
+            </h1>
+            <p className="text-gray-500 mt-2">Track your finances with ease</p>
+          </div>
+
+          <div className="space-y-4">
+            {currentView === 'register' && (
+              <input
+                type="text"
+                placeholder="Full Name"
+                value={authForm.name}
+                onChange={(e) => setAuthForm({...authForm, name: e.target.value})}
+                className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-purple-500 focus:outline-none transition"
+                required
+              />
+            )}
+            <input
+              type="email"
+              placeholder="Email"
+              value={authForm.email}
+              onChange={(e) => setAuthForm({...authForm, email: e.target.value})}
+              className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-purple-500 focus:outline-none transition"
+              required
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={authForm.password}
+              onChange={(e) => setAuthForm({...authForm, password: e.target.value})}
+              onKeyPress={(e) => e.key === 'Enter' && (currentView === 'login' ? handleLogin() : handleRegister())}
+              className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-purple-500 focus:outline-none transition"
+              required
+            />
+            <button
+              onClick={currentView === 'login' ? handleLogin : handleRegister}
+              disabled={loading}
+              className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg transition disabled:opacity-50"
+            >
+              {loading ? 'Processing...' : currentView === 'login' ? 'Login' : 'Register'}
+            </button>
+          </div>
+
+          <div className="text-center mt-6">
+            <button
+              onClick={() => setCurrentView(currentView === 'login' ? 'register' : 'login')}
+              className="text-purple-600 hover:text-purple-700 font-medium"
+            >
+              {currentView === 'login' ? 'Create an account' : 'Already have an account?'}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Main App Layout
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+              <Wallet className="w-6 h-6 text-white" />
+            </div>
+            <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              M1G Budget Tracker
+            </h1>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-xl transition"
+          >
+            <LogOut className="w-5 h-5" />
+            <span>Logout</span>
+          </button>
+        </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* Navigation */}
+        <nav className="flex space-x-2 mb-6 overflow-x-auto pb-2">
+          {['dashboard', 'budgets', 'transactions', 'analytics', 'forecast'].map((view) => (
+            <button
+              key={view}
+              onClick={() => setCurrentView(view)}
+              className={`px-6 py-2 rounded-xl font-medium whitespace-nowrap transition ${
+                currentView === view
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                  : 'bg-white text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              {view.charAt(0).toUpperCase() + view.slice(1)}
+            </button>
+          ))}
+        </nav>
+
+        {/* Dashboard View */}
+        {currentView === 'dashboard' && (
+          <div className="space-y-6">
+            {analytics && (
+              <>
+                {/* Summary Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-white rounded-2xl p-6 shadow-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-gray-500">Total Income</span>
+                      <TrendingUp className="w-5 h-5 text-green-500" />
+                    </div>
+                    <p className="text-3xl font-bold text-green-600">${analytics.total_income?.toFixed(2) || '0.00'}</p>
+                  </div>
+                  <div className="bg-white rounded-2xl p-6 shadow-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-gray-500">Total Expenses</span>
+                      <TrendingDown className="w-5 h-5 text-red-500" />
+                    </div>
+                    <p className="text-3xl font-bold text-red-600">${analytics.total_expense?.toFixed(2) || '0.00'}</p>
+                  </div>
+                  <div className="bg-white rounded-2xl p-6 shadow-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-gray-500">Net Balance</span>
+                      <DollarSign className="w-5 h-5 text-blue-500" />
+                    </div>
+                    <p className="text-3xl font-bold text-blue-600">${analytics.net?.toFixed(2) || '0.00'}</p>
+                  </div>
+                </div>
+
+                {/* Top Categories */}
+                {analytics.top_categories && analytics.top_categories.length > 0 && (
+                  <div className="bg-white rounded-2xl p-6 shadow-lg">
+                    <h2 className="text-xl font-bold mb-4 flex items-center">
+                      <PieChart className="w-6 h-6 mr-2 text-purple-500" />
+                      Top Spending Categories
+                    </h2>
+                    <div className="space-y-3">
+                      {analytics.top_categories.map((cat, idx) => (
+                        <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-400 rounded-lg flex items-center justify-center text-white font-bold">
+                              {idx + 1}
+                            </div>
+                            <span className="font-medium">{cat.category}</span>
+                          </div>
+                          <span className="font-bold text-purple-600">${cat.total.toFixed(2)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Recent Transactions */}
+            <div className="bg-white rounded-2xl p-6 shadow-lg">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold flex items-center">
+                  <FileText className="w-6 h-6 mr-2 text-purple-500" />
+                  Recent Transactions
+                </h2>
+                <button
+                  onClick={() => setCurrentView('transactions')}
+                  className="text-purple-600 hover:text-purple-700 font-medium"
+                >
+                  View All
+                </button>
+              </div>
+              <div className="space-y-2">
+                {transactions.slice(0, 5).map((txn) => (
+                  <div key={txn.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition">
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                        txn.transaction_type === 'income' ? 'bg-green-100' : 'bg-red-100'
+                      }`}>
+                        {txn.transaction_type === 'income' ? 
+                          <TrendingUp className="w-5 h-5 text-green-600" /> : 
+                          <TrendingDown className="w-5 h-5 text-red-600" />
+                        }
+                      </div>
+                      <div>
+                        <p className="font-medium">{txn.category}</p>
+                        <p className="text-sm text-gray-500">{new Date(txn.occurred_at).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+                    <span className={`font-bold ${txn.transaction_type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                      {txn.transaction_type === 'income' ? '+' : '-'}${txn.amount.toFixed(2)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Budgets View */}
+        {currentView === 'budgets' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-2xl p-6 shadow-lg">
+              <h2 className="text-xl font-bold mb-4">Add New Budget</h2>
+              <div className="space-y-4">
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder="Amount"
+                  value={budgetForm.amount}
+                  onChange={(e) => setBudgetForm({...budgetForm, amount: e.target.value})}
+                  className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-purple-500 focus:outline-none"
+                  required
+                />
+                <select
+                  value={budgetForm.period}
+                  onChange={(e) => setBudgetForm({...budgetForm, period: e.target.value})}
+                  className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-purple-500 focus:outline-none"
+                >
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                </select>
+                <label className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    checked={budgetForm.alerts_enabled}
+                    onChange={(e) => setBudgetForm({...budgetForm, alerts_enabled: e.target.checked})}
+                    className="w-5 h-5 text-purple-600 rounded"
+                  />
+                  <span className="text-gray-700">Enable Alerts</span>
+                </label>
+                <button
+                  onClick={handleAddBudget}
+                  disabled={loading}
+                  className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg transition disabled:opacity-50"
+                >
+                  {loading ? 'Adding...' : 'Add Budget'}
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-6 shadow-lg">
+              <h2 className="text-xl font-bold mb-4">Your Budgets</h2>
+              <div className="space-y-3">
+                {budgets.map((budget) => (
+                  <div key={budget.id} className="p-4 bg-gray-50 rounded-xl">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-bold text-lg">${budget.amount.toFixed(2)}</p>
+                        <p className="text-sm text-gray-500 capitalize">{budget.period}</p>
+                      </div>
+                      {budget.alerts_enabled && (
+                        <div className="flex items-center space-x-1 text-green-600">
+                          <CheckCircle className="w-4 h-4" />
+                          <span className="text-sm">Alerts On</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Transactions View */}
+        {currentView === 'transactions' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-2xl p-6 shadow-lg">
+              <h2 className="text-xl font-bold mb-4">Add Transaction</h2>
+              <div className="space-y-4">
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder="Amount"
+                  value={transactionForm.amount}
+                  onChange={(e) => setTransactionForm({...transactionForm, amount: e.target.value})}
+                  className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-purple-500 focus:outline-none"
+                  required
+                />
+                <select
+                  value={transactionForm.category}
+                  onChange={(e) => setTransactionForm({...transactionForm, category: e.target.value})}
+                  className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-purple-500 focus:outline-none"
+                >
+                  {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                </select>
+                <select
+                  value={transactionForm.transaction_type}
+                  onChange={(e) => setTransactionForm({...transactionForm, transaction_type: e.target.value})}
+                  className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-purple-500 focus:outline-none"
+                >
+                  <option value="expense">Expense</option>
+                  <option value="income">Income</option>
+                </select>
+                <input
+                  type="date"
+                  value={transactionForm.occurred_at}
+                  onChange={(e) => setTransactionForm({...transactionForm, occurred_at: e.target.value})}
+                  className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-purple-500 focus:outline-none"
+                  required
+                />
+                <textarea
+                  placeholder="Notes (optional)"
+                  value={transactionForm.notes}
+                  onChange={(e) => setTransactionForm({...transactionForm, notes: e.target.value})}
+                  className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-purple-500 focus:outline-none"
+                  rows="3"
+                />
+                <button
+                  onClick={handleAddTransaction}
+                  disabled={loading}
+                  className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg transition disabled:opacity-50"
+                >
+                  {loading ? 'Adding...' : 'Add Transaction'}
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-6 shadow-lg">
+              <h2 className="text-xl font-bold mb-4">All Transactions</h2>
+              <div className="space-y-2">
+                {transactions.map((txn) => (
+                  <div key={txn.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <p className="font-medium">{txn.category}</p>
+                        <span className={`font-bold ${txn.transaction_type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                          {txn.transaction_type === 'income' ? '+' : '-'}${txn.amount.toFixed(2)}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-500">{new Date(txn.occurred_at).toLocaleDateString()}</p>
+                      {txn.notes && <p className="text-sm text-gray-600 mt-1">{txn.notes}</p>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Analytics View */}
+        {currentView === 'analytics' && analytics && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-2xl p-6 shadow-lg">
+              <h2 className="text-xl font-bold mb-4">Financial Insights</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 bg-purple-50 rounded-xl">
+                  <p className="text-sm text-gray-600 mb-1">Average Monthly Spend</p>
+                  <p className="text-2xl font-bold text-purple-600">
+                    ${analytics.average_monthly_spend?.toFixed(2) || '0.00'}
+                  </p>
+                </div>
+                <div className="p-4 bg-pink-50 rounded-xl">
+                  <p className="text-sm text-gray-600 mb-1">Spending Trend</p>
+                  <p className="text-2xl font-bold text-pink-600 capitalize">
+                    {analytics.trend || 'Stable'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Forecast View */}
+        {currentView === 'forecast' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-2xl p-6 shadow-lg">
+              <h2 className="text-xl font-bold mb-4">Spending Forecast</h2>
+              <div className="space-y-4">
+                <select
+                  value={forecastCategory}
+                  onChange={(e) => setForecastCategory(e.target.value)}
+                  className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-purple-500 focus:outline-none"
+                >
+                  {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                </select>
+                <button
+                  onClick={handleGetForecast}
+                  disabled={loading}
+                  className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg transition disabled:opacity-50"
+                >
+                  {loading ? 'Generating...' : 'Generate Forecast'}
+                </button>
+              </div>
+            </div>
+
+            {forecast && (
+              <div className="bg-white rounded-2xl p-6 shadow-lg">
+                <h3 className="text-lg font-bold mb-4">Forecast Results for {forecastCategory}</h3>
+                <div className="space-y-4">
+                  {forecast.map((model, idx) => (
+                    <div key={idx} className="p-4 bg-gray-50 rounded-xl">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-semibold">{model.model}</span>
+                        <span className="text-sm text-gray-500">{model.data_source}</span>
+                      </div>
+                      {model.forecast && model.forecast.length > 0 && (
+                        <div className="mt-2">
+                          <p className="text-sm text-gray-600 mb-2">Next periods forecast:</p>
+                          <div className="flex flex-wrap gap-2">
+                            {model.forecast.slice(0, 6).map((val, i) => (
+                              <div key={i} className="px-3 py-1 bg-white rounded-lg text-sm font-medium">
+                                ${val.toFixed(2)}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {model.notes && (
+                        <p className="text-sm text-gray-600 mt-2">{model.notes}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default M1GBudgetTracker;

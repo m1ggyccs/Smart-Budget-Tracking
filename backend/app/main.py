@@ -13,8 +13,12 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    # Ensure models are imported and tables can be created on startup if desired.
-    base.Base.metadata.create_all(bind=engine)
+    # Ensure models are imported for Alembic autogenerate support.
+    # For production, use migrations: `alembic upgrade head`
+    # For development, you can enable auto-create by setting AUTO_CREATE_TABLES=true
+    import os
+    if os.getenv("AUTO_CREATE_TABLES", "false").lower() == "true":
+        base.Base.metadata.create_all(bind=engine)
     yield
 
 

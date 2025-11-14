@@ -41,3 +41,10 @@ class TokenPayload(BaseModel):
     sub: str | None = None
     exp: int | None = None
 
+
+class UserUpdate(BaseModel):
+    email: Optional[EmailStr] = None
+    full_name: Optional[str] = None
+    role: Optional[UserRole] = None
+    is_active: Optional[bool] = None
+
