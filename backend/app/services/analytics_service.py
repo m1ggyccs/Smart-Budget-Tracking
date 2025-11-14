@@ -217,6 +217,34 @@ class AnalyticsService:
         results = query.all()
         return [float(Decimal(row.total)) for row in results]
 
+    def get_monthly_total_spending(
+        self,
+        db: Session,
+        user_id: int,
+        months: int = 12,
+    ) -> List[float]:
+        """Get monthly total spending (all expenses) for forecasting budget adherence."""
+        end_date = date.today()
+        start_date = end_date - timedelta(days=months * 30)
+
+        month_expr = func.date_trunc("month", cast(Transaction.occurred_at, Date))
+        query = (
+            db.query(
+                month_expr.label("month"),
+                func.coalesce(func.sum(Transaction.amount), 0).label("total"),
+            )
+            .filter(
+                Transaction.user_id == user_id,
+                Transaction.transaction_type == TransactionType.EXPENSE,
+                Transaction.occurred_at >= start_date,
+            )
+            .group_by(month_expr)
+            .order_by(month_expr)
+        )
+
+        results = query.all()
+        return [float(Decimal(row.total)) for row in results]
+
 
 analytics_service = AnalyticsService()
 

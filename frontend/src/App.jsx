@@ -681,60 +681,94 @@ function InsightCard({ title, value, icon, suffix }) {
   );
 }
 
-function ForecastView({ loading, forecastCategory, setForecastCategory, forecastDetails, onGenerate }) {
+function ForecastView({ loading, forecastBudget, forecastDetails, onGenerate }) {
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-2xl p-6 shadow-lg">
-        <h2 className="text-xl font-bold mb-4">Spending Forecast</h2>
-        <div className="space-y-4">
-          <select
-            value={forecastCategory}
-            onChange={(e) => setForecastCategory(e.target.value)}
-            className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl"
-          >
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
-          <button
-            onClick={onGenerate}
-            disabled={loading}
-            className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg"
-          >
-            {loading ? 'Generating…' : 'Generate Forecast'}
-          </button>
-        </div>
+        <h2 className="text-xl font-bold mb-4">Monthly Budget Forecast</h2>
+        <p className="text-gray-600 mb-4">
+          Forecast your spending for the next 3 months based on your transaction history and compare it against your monthly budget.
+        </p>
+        <button
+          onClick={onGenerate}
+          disabled={loading}
+          className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg"
+        >
+          {loading ? 'Generating…' : 'Generate Forecast'}
+        </button>
       </div>
 
-      {forecastDetails.length > 0 && (
+      {forecastDetails.length > 0 && forecastBudget && (
         <div className="bg-white rounded-2xl p-6 shadow-lg">
-          <h3 className="text-lg font-bold mb-4">Forecast Results for {forecastCategory}</h3>
+          <div className="mb-4">
+            <h3 className="text-lg font-bold">Forecast Results</h3>
+            <p className="text-sm text-gray-600 mt-1">
+              Monthly Budget: <span className="font-semibold text-purple-600">${Number(forecastBudget.amount).toFixed(2)}</span>
+            </p>
+          </div>
           <div className="space-y-4">
-            {forecastDetails.map((model) => (
-              <div key={model.model} className="p-4 bg-gray-50 rounded-xl">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="font-semibold capitalize">{model.model.replace(/_/g, ' ')}</div>
-                  <span className="text-sm text-gray-500">{model.data_source}</span>
-                </div>
-                {model.forecast && model.forecast.length > 0 ? (
-                  <div>
-                    <p className="text-sm text-gray-600 mb-2">Next periods forecast:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {model.forecast.map((val, idx) => (
-                        <div key={`${model.model}-${idx}`} className="px-3 py-1 bg-white rounded-lg text-sm font-medium">
-                          ${Number(val).toFixed(2)}
+            {forecastDetails.map((model) => {
+              const budgetAmount = forecastBudget.amount;
+              return (
+                <div key={model.model} className="p-4 bg-gray-50 rounded-xl">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <div className="font-semibold capitalize">{model.model.replace(/_/g, ' ')}</div>
+                      {model.moving_average?.accuracy && (
+                        <div className="flex items-center space-x-3 mt-1 text-xs">
+                          <span className="text-gray-600">
+                            Accuracy: <span className="font-semibold">{model.moving_average.accuracy.accuracy}</span>
+                          </span>
+                          <span className="text-gray-600">
+                            MAE: <span className="font-semibold">{model.moving_average.accuracy.mae}</span>
+                          </span>
+                          <span className={`px-2 py-0.5 rounded ${
+                            model.moving_average.accuracy.confidence === 'High' ? 'bg-green-100 text-green-700' :
+                            model.moving_average.accuracy.confidence === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
+                            'bg-gray-100 text-gray-700'
+                          }`}>
+                            {model.moving_average.accuracy.confidence} Confidence
+                          </span>
                         </div>
-                      ))}
+                      )}
                     </div>
+                    <span className="text-xs text-gray-500 bg-white px-2 py-1 rounded">{model.data_source}</span>
                   </div>
-                ) : (
-                  <p className="text-sm text-gray-500">No forecast available.</p>
-                )}
-                {model.notes && <p className="text-sm text-gray-600 mt-2">{model.notes}</p>}
-              </div>
-            ))}
+                  {model.forecast && model.forecast.length > 0 ? (
+                    <div>
+                      <p className="text-sm text-gray-600 mb-3">Next 3 months forecast:</p>
+                      <div className="space-y-2">
+                        {model.forecast.map((val, idx) => {
+                          const isOverBudget = val > budgetAmount;
+                          const percentage = (val / budgetAmount) * 100;
+                          return (
+                            <div key={`${model.model}-${idx}`} className="flex items-center justify-between p-3 bg-white rounded-lg">
+                              <div>
+                                <p className="text-sm font-medium">Month {idx + 1}</p>
+                                <p className={`text-lg font-bold ${isOverBudget ? 'text-red-600' : 'text-green-600'}`}>
+                                  ${Number(val).toFixed(2)}
+                                </p>
+                              </div>
+                              <div className="text-right">
+                                <p className={`text-sm font-semibold ${isOverBudget ? 'text-red-600' : 'text-green-600'}`}>
+                                  {percentage.toFixed(1)}% of budget
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  {isOverBudget ? 'Over by' : 'Under by'} ${Math.abs(val - budgetAmount).toFixed(2)}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">No forecast available.</p>
+                  )}
+                  {model.notes && <p className="text-sm text-gray-600 mt-3">{model.notes}</p>}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

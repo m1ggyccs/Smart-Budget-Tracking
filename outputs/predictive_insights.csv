@@ -1,6 +1,6 @@
 Category,Past Avg,Predicted,Trend,Risk Level
-entertainment,709.7340251572326,5259.178770148521,🔴 Overspending risk (↑ 641.0%),high
-groceries,105.82955898566703,8367.1959254416,🔴 Overspending risk (↑ 7806.3%),high
-others,1961.726327,76062.94705404027,🔴 Overspending risk (↑ 3777.3%),high
-transportation,427.3691856677531,9825.69606353117,🔴 Overspending risk (↑ 2199.1%),high
-utilities,49.333333333333336,142.1121727932647,🔴 Overspending risk (↑ 188.1%),high
+entertainment,709.7340251572326,1050.1129051950118,🔴 Overspending risk (↑ 48.0%),high
+groceries,105.82955898566703,1678.0635809389616,🔴 Overspending risk (↑ 1485.6%),high
+others,1961.726327,15080.846821204868,🔴 Overspending risk (↑ 668.8%),high
+transportation,427.3691856677531,1931.8890619501415,🔴 Overspending risk (↑ 352.0%),high
+utilities,49.333333333333336,28.422434558653297,🟢 Improving (↓ 42.4%),low

@@ -93,6 +93,43 @@ def best_model_for_category(cat):
         return "moving_average"
 
 
+# ---------- Prediction Stabilizer ----------
+def stabilize_prediction(past, pred,
+                         max_increase=3.0,
+                         min_decrease=0.25):
+    """
+    Stabilize a single prediction value relative to a 'past' reference.
+
+    - past: reference historical value (usually last observed month)
+    - pred: raw prediction
+    - max_increase: maximum allowed multiplier over `past` (default 3.0 => +300%)
+    - min_decrease: minimum allowed multiplier over `past` (default 0.25 => -75%)
+
+    If past is zero or NaN, the function will return pred unchanged (no historical anchor).
+    """
+    try:
+        past = float(past)
+        pred = float(pred)
+    except Exception:
+        return float(pred)
+
+    if np.isnan(past) or past == 0.0:
+        # no meaningful historical anchor — return prediction as-is
+        return float(pred)
+
+    max_val = past * max_increase
+    min_val = past * min_decrease
+    return float(max(min(pred, max_val), min_val))
+
+
+def stabilize_series(past_reference, preds, max_increase=3.0, min_decrease=0.25):
+    """
+    Apply stabilize_prediction elementwise to a list/array of preds.
+    past_reference: a scalar reference value (e.g., most recent month) used to bound predictions.
+    """
+    return [stabilize_prediction(past_reference, p, max_increase, min_decrease) for p in preds]
+
+
 # ---------- Forecast Functions ----------
 
 def forecast_moving_average(series, months, params):
@@ -158,28 +195,44 @@ def predict_future(df, months, budget):
             print("  (no data for this category; skipping)")
             continue
 
+        # Reference 'past' value for stabilizer: use most recent monthly amount
+        past_ref = float(series.iloc[-1]) if len(series) else 0.0
+
         # Load models
         ma_params = load_moving_average(cat)
         hw_model = load_holt_winters(cat)
         lstm_model, scaler = load_lstm_and_scaler(cat)
 
-        # Compute predictions
-        ma_pred = forecast_moving_average(series, months, ma_params) if ma_params else [0.0] * months
-        hw_pred = forecast_holt_winters(hw_model, months) if hw_model else [0.0] * months
-        lstm_pred = forecast_lstm(series, months, lstm_model, scaler) if lstm_model and scaler else ma_pred
+        # Compute raw predictions
+        ma_pred_raw = forecast_moving_average(series, months, ma_params) if ma_params else [0.0] * months
+        hw_pred_raw = forecast_holt_winters(hw_model, months) if hw_model else [0.0] * months
+        lstm_pred_raw = forecast_lstm(series, months, lstm_model, scaler) if lstm_model and scaler else ma_pred_raw
 
-        # Ensemble (weighted)
+        # Apply stabilizer to each model's predictions
+        ma_pred = stabilize_series(past_ref, ma_pred_raw)
+        hw_pred = stabilize_series(past_ref, hw_pred_raw)
+        lstm_pred = stabilize_series(past_ref, lstm_pred_raw)
+
+        # Ensemble (weighted) — compute from stabilized model predictions
         ensemble_pred = (0.5 * np.array(lstm_pred)) + (0.3 * np.array(hw_pred)) + (0.2 * np.array(ma_pred))
         ensemble_pred = [float(x) for x in ensemble_pred]
 
+        # Also stabilize ensemble relative to the same past_ref (safety net)
+        ensemble_pred = stabilize_series(past_ref, ensemble_pred)
+
         # Choose best model dynamically (per-category)
         best_model = best_model_for_category(cat)
-        best_pred = {
-            "lstm": lstm_pred,
-            "holt_winters": hw_pred,
-            "moving_average": ma_pred,
-            "ensemble": ensemble_pred
+        best_pred_raw = {
+            "lstm": lstm_pred_raw,
+            "holt_winters": hw_pred_raw,
+            "moving_average": ma_pred_raw,
+            "ensemble": ensemble_pred  # use stabilized ensemble as fallback
         }.get(best_model, ensemble_pred)
+
+        # Stabilize best_pred as well (use past_ref)
+        # Note: if best_pred_raw is the ensemble we already stabilized above,
+        # this call will be idempotent.
+        best_pred = stabilize_series(past_ref, best_pred_raw)
 
         # Save per month
         for i in range(months):
