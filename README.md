@@ -44,6 +44,24 @@ The frontend is a React component. To use it:
    ```
 4. Ensure Tailwind CSS is configured in your project
 
+## Streamlit Dashboard
+
+Prefer a ready-made dashboard without setting up the React frontend? Launch the Streamlit experience included in this repo:
+
+```bash
+streamlit run streamlit_app.py
+```
+
+Requirements:
+- Processed data at `data/processed/cleaned_transactions.csv` (run `processing.py`)
+- Trained models inside `models/` (run `training.py`)
+
+Once running, open the provided local URL to interactively:
+- Select forecast horizon (1-12 months) and monthly budget
+- View ensemble vs budget summaries per month
+- Drill into per-category model outputs
+- Inspect predictive insights and download the raw CSV
+
 ## API Endpoints
 
 ### `GET /api/health`
