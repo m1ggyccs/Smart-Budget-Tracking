@@ -16,9 +16,11 @@ import pandas as pd
 import streamlit as st
 
 from simulation import predict_future
+from training import append_and_retrain
 
 
 DATA_PATH = Path(__file__).resolve().parent / "data" / "processed" / "cleaned_transactions.csv"
+REQUIRED_COLUMNS = {"date", "category", "amount"}
 
 
 st.set_page_config(
@@ -121,6 +123,8 @@ def build_monthly_summary(preds_df: pd.DataFrame, budget: float) -> pd.DataFrame
     return summary
 
 
+
+
 def render_overview(preds_df: pd.DataFrame, insights_df: pd.DataFrame, months: int, budget: float):
     total_forecast = preds_df["ensemble"].sum()
     monthly_avg = total_forecast / months if months else total_forecast
@@ -150,6 +154,27 @@ def render_overview(preds_df: pd.DataFrame, insights_df: pd.DataFrame, months: i
         )
     else:
         col3.metric("Highest Risk Category", "N/A", help="Run predictions to see category risks.")
+
+    # Model-level average monthly spend & share
+    model_labels = [
+        ("lstm", "LSTM"),
+        ("holt_winters", "Holt-Winters"),
+        ("moving_average", "Moving Avg"),
+    ]
+    model_totals = preds_df[[key for key, _ in model_labels]].sum()
+    st.markdown("**Average Monthly Spend by Model**")
+    model_cols = st.columns(len(model_labels))
+    for col, (key, label) in zip(model_cols, model_labels):
+        total = model_totals.get(key, 0.0)
+        avg = total / months if months else total
+        pct = (avg / monthly_avg * 100) if monthly_avg else 0.0
+        delta_text = f"{pct:.1f}% of ensemble avg" if monthly_avg else "n/a"
+        col.metric(
+            label,
+            format_currency(avg),
+            delta_text,
+            help=f"Average monthly prediction from the {label} model over the selected horizon.",
+        )
 
 
 def render_monthly_outlook(summary_df: pd.DataFrame):
@@ -266,15 +291,89 @@ def download_predictions_button(preds_df: pd.DataFrame):
 
 
 def main():
+    sidebar_csv_file = None
     with st.sidebar:
         st.header("Forecast Settings")
         months = st.slider("Months Ahead", min_value=1, max_value=12, value=6)
         budget = st.number_input("Monthly Budget (₱)", min_value=0.0, value=25000.0, step=1000.0)
         run_forecast = st.button("Run Forecast", type="primary")
         st.caption("Tip: Ensure processing.py and training.py have been run so models and data exist.")
+        st.markdown("---")
+        st.subheader("➕ Manual Entry & Retrain")
+        entry_date = st.date_input("Date", value=pd.Timestamp.today().date(), key="sidebar_entry_date")
+        entry_category = st.text_input("Category (e.g., groceries)", key="sidebar_entry_cat")
+        entry_amount = st.number_input("Amount (₱)", min_value=0.0, step=100.0, key="sidebar_entry_amt")
+        manual_feedback = st.empty()
+        manual_submit = st.button("Add Transaction & Retrain", key="sidebar_manual_submit")
+
+        st.markdown("---")
+        st.subheader("📁 Append CSV & Retrain")
+        with st.form("sidebar_csv_form"):
+            sidebar_csv_file = st.file_uploader("Select CSV file", type=["csv"], key="sidebar_csv_upload")
+            csv_submit = st.form_submit_button("Append CSV & Retrain")
+        csv_feedback = st.empty()
 
     if "results" not in st.session_state:
         st.session_state["results"] = None
+
+    notice = st.session_state.pop("data_update_notice", None)
+    if notice:
+        st.success(notice)
+
+    data_updated = False
+    if manual_submit:
+        if not DATA_PATH.exists():
+            manual_feedback.info("Processed data not found yet. Run processing.py before adding entries.")
+        else:
+            category = entry_category.strip().lower()
+            if not category:
+                manual_feedback.warning("Category cannot be empty.")
+            else:
+                manual_df = pd.DataFrame(
+                    [
+                        {
+                            "date": pd.to_datetime(entry_date),
+                            "category": category,
+                            "amount": float(entry_amount),
+                        }
+                    ]
+                )
+                try:
+                    append_and_retrain(new_data=manual_df, retrain_all=False, freq="ME")
+                    manual_feedback.success("Manual transaction added and models retrained.")
+                    data_updated = True
+                except Exception as exc:
+                    manual_feedback.error(f"Unable to append manual entry: {exc}")
+
+    if 'csv_submit' in locals() and csv_submit:
+        if not DATA_PATH.exists():
+            csv_feedback.info("Processed data not found yet. Run processing.py before appending CSV data.")
+        elif sidebar_csv_file is None:
+            csv_feedback.warning("Please choose a CSV file before submitting.")
+        else:
+            try:
+                new_df = pd.read_csv(sidebar_csv_file)
+                new_df = new_df.rename(columns={col: col.strip().lower() for col in new_df.columns})
+            except Exception as exc:
+                csv_feedback.error(f"Failed to read CSV: {exc}")
+            else:
+                missing_cols = REQUIRED_COLUMNS - set(new_df.columns)
+                if missing_cols:
+                    csv_feedback.error(f"CSV must include columns: {', '.join(sorted(REQUIRED_COLUMNS))}")
+                else:
+                    try:
+                        append_and_retrain(new_data=new_df, retrain_all=False, freq="ME")
+                        csv_feedback.success("CSV data appended and models retrained.")
+                        data_updated = True
+                    except Exception as exc:
+                        csv_feedback.error(f"Unable to append CSV data: {exc}")
+    if data_updated:
+        load_history_data.clear()
+        st.session_state["results"] = None
+        st.session_state["data_update_notice"] = (
+            "New data added and models retrained. Run a forecast to see the updated predictions."
+        )
+        st.experimental_rerun()
 
     if run_forecast:
         try:

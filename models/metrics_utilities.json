@@ -1,0 +1,19 @@
+{
+  "category": "utilities",
+  "points": 129,
+  "train_points": 90,
+  "test_points": 39,
+  "moving_average": {
+    "mae": 11.666666666666666,
+    "rmse": 72.85830998131465
+  },
+  "holt_winters": {
+    "mae": 12.06172634977855,
+    "rmse": 72.92261284982024
+  },
+  "lstm": {
+    "mae": 11.687527656555176,
+    "rmse": 72.85479257249484,
+    "test_points": 39
+  }
+}
