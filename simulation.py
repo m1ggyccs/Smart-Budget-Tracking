@@ -78,19 +78,31 @@ def load_metrics(cat):
         return json.load(f)
 
 
+MODEL_DISPLAY_NAMES = {
+    "lstm": "LSTM",
+    "holt_winters": "Holt-Winters",
+    "moving_average": "Moving Average",
+}
+
+
 def best_model_for_category(cat):
-    """Select best model based on RMSE (fallbacks provided)."""
+    """Select the model with the lowest recorded RMSE (fallbacks provided)."""
     metrics = load_metrics(cat)
-    rmse = metrics.get("rmse", None)
-    # heuristic thresholds (tune for your data)
-    if rmse is None:
-        return "lstm"  # default if no metrics
-    if rmse < 0.15:
-        return "lstm"
-    elif rmse < 0.25:
-        return "holt_winters"
-    else:
-        return "moving_average"
+    candidates = {}
+    for key in ("lstm", "holt_winters", "moving_average"):
+        rmse = (
+            metrics.get(key, {}).get("rmse")
+            if isinstance(metrics.get(key), dict)
+            else None
+        )
+        if rmse is not None:
+            candidates[key] = rmse
+
+    if candidates:
+        return min(candidates, key=candidates.get)
+
+    # default fallback when no metrics exist yet
+    return "lstm"
 
 
 # ---------- Forecast Functions ----------
@@ -128,6 +140,74 @@ def forecast_lstm(series, months, model, scaler, seq_len=12):
         preds.append(float(yhat))
         vals = np.append(vals, yhat)
     return preds
+
+
+def collect_model_metrics(categories):
+    """Build a long-form DataFrame with MAE/RMSE per model & category."""
+    rows = []
+    for cat in categories:
+        metrics = load_metrics(cat)
+        if not metrics:
+            continue
+        for model_key in ("moving_average", "holt_winters", "lstm"):
+            model_metrics = metrics.get(model_key)
+            if not isinstance(model_metrics, dict):
+                continue
+            mae = model_metrics.get("mae")
+            rmse = model_metrics.get("rmse")
+            if mae is None and rmse is None:
+                continue
+            rows.append(
+                {
+                    "category": cat,
+                    "model": model_key,
+                    "mae": mae,
+                    "rmse": rmse,
+                }
+            )
+
+    return pd.DataFrame(rows)
+
+
+def plot_model_metrics(metrics_df, show=False):
+    """Create and optionally display a dual-panel bar chart for MAE/RMSE."""
+    if metrics_df.empty:
+        return None
+
+    summary = (
+        metrics_df.groupby("model")[["mae", "rmse"]]
+        .mean()
+        .sort_values("rmse")
+    )
+
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+    for ax, metric in zip(axes, ["mae", "rmse"]):
+        summary[metric].plot(
+            kind="barh",
+            ax=ax,
+            color="#3f51b5" if metric == "rmse" else "#009688",
+            legend=False,
+        )
+        ax.set_xlabel(f"Average {metric.upper()}")
+        ax.set_ylabel("")
+        ax.set_title(f"Average {metric.upper()} by Model")
+        ax.grid(axis="x", linestyle="--", alpha=0.3)
+        ax.set_yticklabels(
+            [MODEL_DISPLAY_NAMES.get(lbl.get_text(), lbl.get_text()) for lbl in ax.get_yticklabels()]
+        )
+
+    fig.suptitle("Model Validation Metrics Overview", fontsize=14, fontweight="bold")
+    fig.tight_layout()
+    out_path = OUTPUTS_DIR / "model_metrics_summary.png"
+    fig.savefig(out_path, dpi=150, bbox_inches="tight")
+
+    if show:
+        plt.show()
+    else:
+        plt.close(fig)
+
+    print(f"[Metrics] Saved visualization to {out_path}")
+    return out_path
 
 
 # ---------- Data Utilities ----------
@@ -307,6 +387,18 @@ def predict_future(df, months, budget):
     else:
         print("No predictive insights (no predicted totals).")
 
+    # -----------------------
+    # Model Metrics Snapshot & Visualization
+    # -----------------------
+    metrics_df = collect_model_metrics(categories)
+    if not metrics_df.empty:
+        metrics_csv = OUTPUTS_DIR / "model_metrics_snapshot.csv"
+        metrics_df.to_csv(metrics_csv, index=False)
+        print(f"[Metrics] Saved raw metrics snapshot to {metrics_csv}")
+        plot_model_metrics(metrics_df, show=False)
+    else:
+        print("[Metrics] No stored evaluation metrics found. Run training.py to generate them.")
+
     return df_pred
 
 
@@ -367,6 +459,17 @@ def main():
                 plt.show()
             else:
                 print("No predictions to plot.")
+
+        metrics_plot = OUTPUTS_DIR / "model_metrics_summary.png"
+        if metrics_plot.exists():
+            metrics_view = input("View model metrics chart? (y/n): ").strip().lower()
+            if metrics_view == "y":
+                img = plt.imread(str(metrics_plot))
+                plt.figure(figsize=(8, 5))
+                plt.imshow(img)
+                plt.axis("off")
+                plt.title("Model Metrics Overview")
+                plt.show()
 
 if __name__ == "__main__":
     main()

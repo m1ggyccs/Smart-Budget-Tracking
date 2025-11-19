@@ -1,0 +1,19 @@
+{
+  "category": "groceries",
+  "points": 45,
+  "train_points": 31,
+  "test_points": 14,
+  "moving_average": {
+    "mae": 1155.7800000000002,
+    "rmse": 1277.982735085334
+  },
+  "holt_winters": {
+    "mae": 865.3782295681333,
+    "rmse": 1114.4694592329654
+  },
+  "lstm": {
+    "mae": 767.8126220703125,
+    "rmse": 1069.422098612143,
+    "test_points": 14
+  }
+}

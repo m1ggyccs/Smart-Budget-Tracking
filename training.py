@@ -109,7 +109,8 @@ def evaluate_predictions(actual: pd.Series, predicted: pd.Series) -> Dict[str, O
     if df.empty:
         return {"mae": None, "rmse": None}
     mae = mean_absolute_error(df["actual"], df["predicted"])
-    rmse = mean_squared_error(df["actual"], df["predicted"], squared=False)
+    mse = mean_squared_error(df["actual"], df["predicted"])
+    rmse = float(np.sqrt(mse))
     return {"mae": float(mae), "rmse": float(rmse)}
 
 
@@ -280,7 +281,7 @@ def train_all(freq: str = "ME"):
         results[cat] = train_models_for_category(cat, series)
     # Summary
     trained = sum(sum(v.values()) for v in results.values())
-    print(f"\n✅ Training complete: {trained} models saved.")
+    print(f"\n[OK] Training complete: {trained} models saved.")
     return results
 
 # =====================================================

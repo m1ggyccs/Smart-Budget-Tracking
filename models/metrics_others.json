@@ -1,0 +1,19 @@
+{
+  "category": "others",
+  "points": 45,
+  "train_points": 31,
+  "test_points": 14,
+  "moving_average": {
+    "mae": 15392.392571428572,
+    "rmse": 17874.744715828016
+  },
+  "holt_winters": {
+    "mae": 11761.346967968848,
+    "rmse": 14097.879615053536
+  },
+  "lstm": {
+    "mae": 12032.3828125,
+    "rmse": 14039.04555160357,
+    "test_points": 14
+  }
+}

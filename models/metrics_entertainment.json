@@ -1,0 +1,19 @@
+{
+  "category": "entertainment",
+  "points": 33,
+  "train_points": 23,
+  "test_points": 10,
+  "moving_average": {
+    "mae": 5015.693333333334,
+    "rmse": 7881.640294135194
+  },
+  "holt_winters": {
+    "mae": 2935.2831999222376,
+    "rmse": 6604.851031204154
+  },
+  "lstm": {
+    "mae": 3223.538330078125,
+    "rmse": 6709.271197380533,
+    "test_points": 10
+  }
+}

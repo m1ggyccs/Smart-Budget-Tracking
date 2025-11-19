@@ -1,0 +1,19 @@
+{
+  "category": "transportation",
+  "points": 45,
+  "train_points": 31,
+  "test_points": 14,
+  "moving_average": {
+    "mae": 8910.118095238124,
+    "rmse": 17007.9100009946
+  },
+  "holt_winters": {
+    "mae": 5094.993708444248,
+    "rmse": 14488.294388855731
+  },
+  "lstm": {
+    "mae": 5402.08056640625,
+    "rmse": 14591.377179690751,
+    "test_points": 14
+  }
+}
