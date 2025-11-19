@@ -85,6 +85,24 @@ def moving_average_forecast(series, window=3):
     return {"window": window, "mean": float(avg), "last_values": vals[-window:].tolist()}
 
 
+def rolling_ma_predict(train_series: pd.Series, test_series: pd.Series, window: int = 3) -> pd.Series:
+    """
+    Sequential one-step-ahead moving-average predictions for the holdout set.
+    Uses only past actuals (including previously observed holdout points) so it
+    simulates walk-forward evaluation.
+    """
+    if test_series.empty:
+        return pd.Series(dtype="float64")
+
+    history = train_series.tolist()
+    preds = []
+    for actual in test_series:
+        ctx = history[-window:] if window > 0 else history
+        preds.append(float(np.mean(ctx)) if ctx else np.nan)
+        history.append(actual)
+    return pd.Series(preds, index=test_series.index)
+
+
 def evaluate_predictions(actual: pd.Series, predicted: pd.Series) -> Dict[str, Optional[float]]:
     """Compute MAE and RMSE between aligned actual and predicted values."""
     df = pd.DataFrame({"actual": actual, "predicted": predicted}).dropna()
@@ -113,34 +131,46 @@ def train_models_for_category(category: str, series: pd.Series) -> Dict[str, boo
     metrics = {
         "category": category,
         "points": int(len(series)),
+        "train_points": 0,
+        "test_points": 0,
         "moving_average": {"mae": None, "rmse": None},
         "holt_winters": {"mae": None, "rmse": None},
-        "lstm": {"mae": None, "rmse": None, "val_points": 0},
+        "lstm": {"mae": None, "rmse": None, "test_points": 0},
     }
 
+    split_idx = max(1, int(len(series) * 0.7))
+    if split_idx >= len(series):
+        split_idx = len(series) - 1
+    train_series = series.iloc[:split_idx]
+    test_series = series.iloc[split_idx:]
+    metrics["train_points"] = int(len(train_series))
+    metrics["test_points"] = int(len(test_series))
+
     # ----- Moving Average -----
-    ma_params = moving_average_forecast(series)
+    ma_params = moving_average_forecast(train_series)
     ma_path = MODELS_DIR / f"moving_average_{safe_name(category)}.json"
     with open(ma_path, "w", encoding="utf-8") as f:
         json.dump(ma_params, f, indent=2)
     results["ma"] = True
     print(f"[MA] Saved -> {ma_path}")
     window = ma_params.get("window", 3)
-    if len(series) > window:
-        ma_pred_series = series.rolling(window=window).mean().shift(1)
-        metrics["moving_average"].update(evaluate_predictions(series, ma_pred_series))
+    if len(test_series) > 0:
+        ma_preds = rolling_ma_predict(train_series, test_series, window)
+        metrics["moving_average"].update(evaluate_predictions(test_series, ma_preds))
 
     # ----- Holt-Winters -----
     try:
-        hw_model = ExponentialSmoothing(series, trend="add", seasonal=None, damped_trend=True).fit()
+        hw_model = ExponentialSmoothing(train_series, trend="add", seasonal=None, damped_trend=True).fit()
         hw_path = MODELS_DIR / f"holtwinters_{safe_name(category)}.pkl"
         with open(hw_path, "wb") as f:
             pickle.dump(hw_model, f)
         results["hw"] = True
         print(f"[HW] Saved -> {hw_path}")
         try:
-            fitted = pd.Series(hw_model.fittedvalues, index=series.index)
-            metrics["holt_winters"].update(evaluate_predictions(series, fitted))
+            if len(test_series) > 0:
+                hw_forecast = hw_model.forecast(steps=len(test_series))
+                hw_preds = pd.Series(hw_forecast, index=test_series.index)
+                metrics["holt_winters"].update(evaluate_predictions(test_series, hw_preds))
         except Exception as eval_err:
             print(f"[HW] Unable to compute metrics for {category}: {eval_err}")
     except Exception as e:
@@ -148,24 +178,36 @@ def train_models_for_category(category: str, series: pd.Series) -> Dict[str, boo
 
     # ----- LSTM -----
     try:
-        vals = series.values.astype("float32")
-        scaler = MinMaxScaler(feature_range=(0, 1))
-        vals_scaled = scaler.fit_transform(vals.reshape(-1, 1)).flatten()
+        train_vals = train_series.values.astype("float32")
+        test_vals = test_series.values.astype("float32")
 
-        if len(vals_scaled) <= SEQ_LEN + 2:
-            print(f"[LSTM] Skipping {category}: not enough history ({len(vals_scaled)} pts)")
+        if len(train_vals) <= SEQ_LEN:
+            print(f"[LSTM] Skipping {category}: not enough training history ({len(train_vals)} pts)")
             return results
 
-        X, y = make_sequence_data(pd.Series(vals_scaled), SEQ_LEN)
-        split = max(1, int(len(X) * 0.9))
-        X_train, X_val = X[:split], X[split:]
-        y_train, y_val = y[:split], y[split:]
+        scaler = MinMaxScaler(feature_range=(0, 1))
+        train_scaled = scaler.fit_transform(train_vals.reshape(-1, 1)).flatten()
+        test_scaled = scaler.transform(test_vals.reshape(-1, 1)).flatten() if len(test_vals) > 0 else np.array([])
+
+        X_train, y_train = make_sequence_data(pd.Series(train_scaled), SEQ_LEN)
+        if len(X_train) == 0:
+            print(f"[LSTM] Skipping {category}: unable to build training sequences.")
+            return results
+
+        full_scaled = np.concatenate([train_scaled, test_scaled]) if len(test_scaled) > 0 else train_scaled
+        X_all, y_all = make_sequence_data(pd.Series(full_scaled), SEQ_LEN)
+        test_start_idx = len(train_scaled) - SEQ_LEN
+        if len(test_scaled) > 0 and test_start_idx < len(X_all):
+            X_test = X_all[test_start_idx:]
+            y_test = y_all[test_start_idx:]
+        else:
+            X_test, y_test = np.array([]), np.array([])
 
         model = build_lstm(SEQ_LEN)
         es = EarlyStopping(monitor="val_loss", patience=6, restore_best_weights=True, verbose=1)
         model.fit(
             X_train, y_train,
-            validation_data=(X_val, y_val) if len(X_val) > 0 else None,
+            validation_data=(X_test, y_test) if len(X_test) > 0 else None,
             epochs=EPOCHS,
             batch_size=BATCH_SIZE,
             verbose=2,
@@ -173,19 +215,19 @@ def train_models_for_category(category: str, series: pd.Series) -> Dict[str, boo
         )
 
         # evaluate
-        preds_val = model.predict(X_val).flatten() if len(X_val) > 0 else []
+        preds_val = model.predict(X_test).flatten() if len(X_test) > 0 else []
         if len(preds_val) > 0:
             preds_val_orig = scaler.inverse_transform(preds_val.reshape(-1, 1)).flatten()
-            y_val_orig = scaler.inverse_transform(y_val.reshape(-1, 1)).flatten()
+            y_val_orig = scaler.inverse_transform(y_test.reshape(-1, 1)).flatten()
             lstm_metrics = evaluate_predictions(
                 pd.Series(y_val_orig, name="actual"),
                 pd.Series(preds_val_orig, name="predicted"),
             )
             metrics["lstm"].update(lstm_metrics)
-            metrics["lstm"]["val_points"] = int(len(y_val_orig))
+            metrics["lstm"]["test_points"] = int(len(y_val_orig))
         else:
             metrics["lstm"].update({"mae": None, "rmse": None})
-            metrics["lstm"]["val_points"] = 0
+            metrics["lstm"]["test_points"] = 0
 
         # save model & scaler
         model_path = MODELS_DIR / f"lstm_{safe_name(category)}.h5"
