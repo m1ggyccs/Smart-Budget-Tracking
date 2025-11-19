@@ -19,7 +19,7 @@ import os
 import json
 import pickle
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Optional
 
 import numpy as np
 import pandas as pd
@@ -85,6 +85,16 @@ def moving_average_forecast(series, window=3):
     return {"window": window, "mean": float(avg), "last_values": vals[-window:].tolist()}
 
 
+def evaluate_predictions(actual: pd.Series, predicted: pd.Series) -> Dict[str, Optional[float]]:
+    """Compute MAE and RMSE between aligned actual and predicted values."""
+    df = pd.DataFrame({"actual": actual, "predicted": predicted}).dropna()
+    if df.empty:
+        return {"mae": None, "rmse": None}
+    mae = mean_absolute_error(df["actual"], df["predicted"])
+    rmse = mean_squared_error(df["actual"], df["predicted"], squared=False)
+    return {"mae": float(mae), "rmse": float(rmse)}
+
+
 # ==========================
 # Model training
 # ==========================
@@ -100,6 +110,14 @@ def train_models_for_category(category: str, series: pd.Series) -> Dict[str, boo
 
     print(f"\n=== Training models for category: {category} ===")
 
+    metrics = {
+        "category": category,
+        "points": int(len(series)),
+        "moving_average": {"mae": None, "rmse": None},
+        "holt_winters": {"mae": None, "rmse": None},
+        "lstm": {"mae": None, "rmse": None, "val_points": 0},
+    }
+
     # ----- Moving Average -----
     ma_params = moving_average_forecast(series)
     ma_path = MODELS_DIR / f"moving_average_{safe_name(category)}.json"
@@ -107,6 +125,10 @@ def train_models_for_category(category: str, series: pd.Series) -> Dict[str, boo
         json.dump(ma_params, f, indent=2)
     results["ma"] = True
     print(f"[MA] Saved -> {ma_path}")
+    window = ma_params.get("window", 3)
+    if len(series) > window:
+        ma_pred_series = series.rolling(window=window).mean().shift(1)
+        metrics["moving_average"].update(evaluate_predictions(series, ma_pred_series))
 
     # ----- Holt-Winters -----
     try:
@@ -116,6 +138,11 @@ def train_models_for_category(category: str, series: pd.Series) -> Dict[str, boo
             pickle.dump(hw_model, f)
         results["hw"] = True
         print(f"[HW] Saved -> {hw_path}")
+        try:
+            fitted = pd.Series(hw_model.fittedvalues, index=series.index)
+            metrics["holt_winters"].update(evaluate_predictions(series, fitted))
+        except Exception as eval_err:
+            print(f"[HW] Unable to compute metrics for {category}: {eval_err}")
     except Exception as e:
         print(f"[HW] Failed for {category}: {e}")
 
@@ -148,10 +175,17 @@ def train_models_for_category(category: str, series: pd.Series) -> Dict[str, boo
         # evaluate
         preds_val = model.predict(X_val).flatten() if len(X_val) > 0 else []
         if len(preds_val) > 0:
-            mae = mean_absolute_error(y_val, preds_val)
-            rmse = mean_squared_error(y_val, preds_val, squared=False)
+            preds_val_orig = scaler.inverse_transform(preds_val.reshape(-1, 1)).flatten()
+            y_val_orig = scaler.inverse_transform(y_val.reshape(-1, 1)).flatten()
+            lstm_metrics = evaluate_predictions(
+                pd.Series(y_val_orig, name="actual"),
+                pd.Series(preds_val_orig, name="predicted"),
+            )
+            metrics["lstm"].update(lstm_metrics)
+            metrics["lstm"]["val_points"] = int(len(y_val_orig))
         else:
-            mae, rmse = None, None
+            metrics["lstm"].update({"mae": None, "rmse": None})
+            metrics["lstm"]["val_points"] = 0
 
         # save model & scaler
         model_path = MODELS_DIR / f"lstm_{safe_name(category)}.h5"
@@ -160,16 +194,16 @@ def train_models_for_category(category: str, series: pd.Series) -> Dict[str, boo
         with open(scaler_path, "wb") as f:
             pickle.dump(scaler, f)
 
-        # save metrics
-        metrics = {"mae": mae, "rmse": rmse, "points": len(series)}
-        metrics_path = MODELS_DIR / f"metrics_{safe_name(category)}.json"
-        with open(metrics_path, "w", encoding="utf-8") as f:
-            json.dump(metrics, f, indent=2)
-
         results["lstm"] = True
-        print(f"[LSTM] Saved -> {model_path} | Metrics: {metrics}")
+        print(f"[LSTM] Saved -> {model_path} | Metrics: {metrics['lstm']}")
     except Exception as e:
         print(f"[LSTM] Failed for {category}: {e}")
+
+    # Persist per-category evaluation metrics
+    metrics_path = MODELS_DIR / f"metrics_{safe_name(category)}.json"
+    with open(metrics_path, "w", encoding="utf-8") as f:
+        json.dump(metrics, f, indent=2)
+    print(f"[METRICS] Saved -> {metrics_path}")
 
     return results
 
