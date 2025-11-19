@@ -160,7 +160,7 @@ def render_monthly_outlook(summary_df: pd.DataFrame):
 
     styled = summary_df.copy()
     numeric_cols = ["moving_average", "holt_winters", "lstm", "ensemble", "best_pred", "budget", "diff_vs_budget"]
-    styled[numeric_cols] = styled[numeric_cols].applymap(format_currency)
+    styled[numeric_cols] = styled[numeric_cols].map(format_currency)
     st.dataframe(
         styled.rename(
             columns={
@@ -177,10 +177,6 @@ def render_monthly_outlook(summary_df: pd.DataFrame):
         use_container_width=True,
         hide_index=True,
     )
-
-    chart_data = summary_df.set_index("Month Ahead")[["ensemble", "budget"]]
-    chart_data.rename(columns={"ensemble": "Ensemble Forecast", "budget": "Budget"}, inplace=True)
-    st.line_chart(chart_data)
 
 
 def render_category_breakdown(preds_df: pd.DataFrame):
